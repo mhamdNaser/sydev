@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('icon_categories', function (Blueprint $table) {
-            $table->id();
+            $table->id(); // بدل bigInteger غير مخصص
             $table->string('name');
             $table->string('slug')->unique();
             $table->text('description')->nullable();

@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->foreignId('category_id')->constrained()->onDelete('cascade');
+            $table->foreignId('category_id')->constrained('icon_categories')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->boolean('is_premium')->default(false);
             $table->integer('download_count')->default(0);
-            $table->json('tags')->nullable(); // أو يمكن عمل جدول منفصل للtags
+            $table->json('tags')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
