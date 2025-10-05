@@ -16,8 +16,7 @@ class UserController extends Controller
      */
     public function index()
     {
-        // return response()->json(UserResource::collection($this->users->all()));
-        return response()->json(['message' => 'All admins endpoint working!']);
+        return response()->json(UserResource::collection($this->users->all()));
     }
 
     /**
