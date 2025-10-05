@@ -13,6 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        dd('im in UserRepository');
         $this->app->bind(UserRepositoryInterface::class, UserRepository::class);
     }
 

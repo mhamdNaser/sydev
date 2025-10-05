@@ -10,7 +10,7 @@ class UserRepository implements UserRepositoryInterface
 {
     public function all()
     {
-        dd('im in UserRepositoryInterface');
+        dd('im in UserRepository');
         return User::latest()->get();
     }
 
