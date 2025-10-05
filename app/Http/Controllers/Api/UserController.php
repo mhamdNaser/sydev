@@ -3,16 +3,20 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\UserResource;
+use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+
+    public function __construct(private UserRepositoryInterface $users) {}
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        return response()->json(UserResource::collection($this->users->all()));
     }
 
     /**
