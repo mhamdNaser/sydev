@@ -11,6 +11,6 @@ Route::get('/user', function (Request $request) {
 
 
 Route::prefix( 'admin' )->group(function(){
-    Route::post('login', [ UserController::class ])->name('admin.login');
-    Route::get('alladmin', [ UserController::class ])->name('admin.alladmin');
+    Route::post('login', [ UserController::class, 'login' ])->name('admin.login');
+    Route::get('alladmin', [ UserController::class, 'index' ])->name('admin.alladmin');
 });
