@@ -10,7 +10,8 @@ class UserRepository implements UserRepositoryInterface
 {
     public function all()
     {
-        return User::get();
+        dd('im in UserRepositoryInterface');
+        return User::latest()->get();
     }
 
     public function find($id): ?User
