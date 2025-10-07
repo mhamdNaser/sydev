@@ -27,14 +27,14 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}/api/admin/register",
+							"raw": "{{baseURL}}/api/admin/adminregister",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
 								"api",
 								"admin",
-								"register"
+								"adminregister"
 							]
 						}
 					},
@@ -48,7 +48,18 @@
 					},
 					"request": {
 						"method": "GET",
-						"header": []
+						"header": [],
+						"url": {
+							"raw": "{{baseURL}}/api/admin/alladmin",
+							"host": [
+								"{{baseURL}}"
+							],
+							"path": [
+								"api",
+								"admin",
+								"alladmin"
+							]
+						}
 					},
 					"response": []
 				},
