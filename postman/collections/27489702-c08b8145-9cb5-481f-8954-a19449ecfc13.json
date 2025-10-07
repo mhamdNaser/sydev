@@ -15,6 +15,41 @@
 						"disableBodyPruning": true
 					},
 					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"name\": \"Naser\",\r\n  \"email\": \"nmhammed50@gmail.com\",\r\n  \"password\": \"Naser?2025\",\r\n  \"role\": \"admin\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sydev.site/api/admin/register",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sydev",
+								"site"
+							],
+							"path": [
+								"api",
+								"admin",
+								"register"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "New Request",
+					"id": "27489702-8d91fff7-b96b-4bee-b4af-e5b6aa6a9a37",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
 						"method": "GET",
 						"header": []
 					},
@@ -22,7 +57,7 @@
 				},
 				{
 					"name": "New Request",
-					"id": "27489702-8d91fff7-b96b-4bee-b4af-e5b6aa6a9a37",
+					"id": "27489702-3cc972fa-5d4b-4cc9-ad16-9bef42d451af",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
 					},
