@@ -6,9 +6,14 @@
 	},
 	"item": [
 		{
-			"name": "admin",
+			"name": "adminPanel",
 			"item": [],
 			"id": "27489702-d046723c-1e85-4b4f-80e8-cbc5e9320ff3"
+		},
+		{
+			"name": "New Folder",
+			"item": [],
+			"id": "27489702-3354b380-5651-4740-9cc7-c60c32be149b"
 		}
 	],
 	"auth": {
