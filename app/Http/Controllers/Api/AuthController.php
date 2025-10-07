@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\UserResource;
 use App\Http\Requests\Admin\User\RegisterRequest;
+use App\Http\Requests\Admin\User\LoginRequest;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
 
@@ -26,10 +27,9 @@ class AuthController extends Controller
     }
 
     // ✅ Login بدون سكوب (أي مستخدم)
-    public function login(Request $request)
+    public function login(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
-        $user = $this->users->login($credentials);
+        $user = $this->users->login($request->validated());
 
         if (!$user) {
             return response()->json(['message' => 'Invalid credentials'], 401);
@@ -44,10 +44,9 @@ class AuthController extends Controller
     }
 
     // ✅ Login خاص بالأدمن فقط
-    public function adminLogin(Request $request)
+    public function adminLogin(LoginRequest $request)
     {
-        $credentials = $request->only('email', 'password');
-        $user = $this->users->login($credentials, 'admin');
+        $user = $this->users->login($request->validated(), 'admin');
 
         if (!$user) {
             return response()->json(['message' => 'Invalid admin credentials'], 401);
