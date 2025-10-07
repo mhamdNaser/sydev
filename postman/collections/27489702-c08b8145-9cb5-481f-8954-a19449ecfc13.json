@@ -7,11 +7,24 @@
 	"item": [
 		{
 			"name": "adminPanel",
-			"item": [],
+			"item": [
+				{
+					"name": "New Request",
+					"id": "27489702-78f27a56-889f-4983-9a4e-4c6103f72abd",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			],
 			"id": "27489702-d046723c-1e85-4b4f-80e8-cbc5e9320ff3"
 		},
 		{
-			"name": "New Folder",
+			"name": "userSite",
 			"item": [],
 			"id": "27489702-3354b380-5651-4740-9cc7-c60c32be149b"
 		}
