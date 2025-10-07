@@ -76,14 +76,11 @@
 			"id": "27489702-3354b380-5651-4740-9cc7-c60c32be149b"
 		}
 	],
-	"auth": {
-		"type": "basic"
-	},
 	"event": [
 		{
 			"listen": "prerequest",
 			"script": {
-				"id": "803dbcde-5539-45fc-888e-f8ca0d86d920",
+				"id": "3c83ceab-46e9-4ff9-93a6-244240042820",
 				"type": "text/javascript",
 				"packages": {},
 				"requests": {},
@@ -95,7 +92,7 @@
 		{
 			"listen": "test",
 			"script": {
-				"id": "ffea7ec3-0da3-4a12-8905-19aaade1fb90",
+				"id": "eb26cdbf-e53a-4b60-a98e-585ea3c84c4a",
 				"type": "text/javascript",
 				"packages": {},
 				"requests": {},
