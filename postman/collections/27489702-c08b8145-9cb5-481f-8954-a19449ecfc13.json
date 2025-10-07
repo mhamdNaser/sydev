@@ -9,7 +9,7 @@
 			"name": "adminPanel",
 			"item": [
 				{
-					"name": "New Request",
+					"name": "admin_register",
 					"id": "27489702-78f27a56-889f-4983-9a4e-4c6103f72abd",
 					"protocolProfileBehavior": {
 						"disableBodyPruning": true
