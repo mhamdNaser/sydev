@@ -62,8 +62,37 @@
 						"disableBodyPruning": true
 					},
 					"request": {
-						"method": "GET",
-						"header": []
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"email\": \"nmhammed50@gmail.com\",\n  \"password\": \"Naser?2025\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://api.sydev.site/api/admin/adminLogin",
+							"protocol": "https",
+							"host": [
+								"api",
+								"sydev",
+								"site"
+							],
+							"path": [
+								"api",
+								"admin",
+								"adminLogin"
+							]
+						}
 					},
 					"response": []
 				}
