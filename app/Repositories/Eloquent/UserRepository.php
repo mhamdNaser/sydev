@@ -37,4 +37,23 @@ class UserRepository implements UserRepositoryInterface
     {
         return $user->delete();
     }
+
+    public function login(array $credentials, ?string $role = null): ?User
+    {
+        $query = User::query();
+
+        if ($role === 'admin') {
+            $query->admin();
+        } elseif ($role === 'user') {
+            $query->user();
+        }
+
+        $user = $query->where('email', $credentials['email'])->first();
+
+        if ($user && Hash::check($credentials['password'], $user->password)) {
+            return $user;
+        }
+
+        return null;
+    }
 }
