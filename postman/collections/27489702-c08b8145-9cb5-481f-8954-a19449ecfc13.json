@@ -4,7 +4,13 @@
 		"name": "Sydev",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
-	"item": [],
+	"item": [
+		{
+			"name": "New Folder",
+			"item": [],
+			"id": "27489702-d046723c-1e85-4b4f-80e8-cbc5e9320ff3"
+		}
+	],
 	"auth": {
 		"type": "basic"
 	},
