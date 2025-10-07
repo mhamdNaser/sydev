@@ -27,12 +27,9 @@
 							}
 						},
 						"url": {
-							"raw": "https://api.sydev.site/api/admin/register",
-							"protocol": "https",
+							"raw": "{{baseURL}}/api/admin/register",
 							"host": [
-								"api",
-								"sydev",
-								"site"
+								"{{baseURL}}"
 							],
 							"path": [
 								"api",
@@ -80,12 +77,9 @@
 							}
 						},
 						"url": {
-							"raw": "https://api.sydev.site/api/admin/adminLogin",
-							"protocol": "https",
+							"raw": "{{baseURL}}/api/admin/adminLogin",
 							"host": [
-								"api",
-								"sydev",
-								"site"
+								"{{baseURL}}"
 							],
 							"path": [
 								"api",
@@ -129,6 +123,13 @@
 					""
 				]
 			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "",
+			"type": "default"
 		}
 	]
 }
