@@ -10,11 +10,11 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
+Route::post('login', [AuthController::class, 'login']);
 
 Route::prefix('admin')->group(function () {
-    Route::post('register', [AuthController::class, 'register']);
-    Route::post('login', [AuthController::class, 'login']);
-    Route::post('admin/login', [AuthController::class, 'adminLogin']);
+    Route::post('adminregister', [AuthController::class, 'adminregister']);
+    Route::post('adminLogin', [AuthController::class, 'adminLogin']);
     Route::get('alladmin', [UserController::class, 'index'])->name('alladmin');
 
     Route::middleware('auth:sanctum')->group(function () {
