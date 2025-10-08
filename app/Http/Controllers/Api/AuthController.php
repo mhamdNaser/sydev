@@ -53,6 +53,7 @@ class AuthController extends Controller
         }
 
         $token = $user->createToken('admin_token')->plainTextToken;
+        dd($token);
 
         return response()->json([
             'user' => new UserResource($user),
