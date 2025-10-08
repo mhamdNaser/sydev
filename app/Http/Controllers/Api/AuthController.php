@@ -46,8 +46,8 @@ class AuthController extends Controller
     // ✅ Login خاص بالأدمن فقط
     public function adminLogin(LoginRequest $request)
     {
-        dd("test");
         $user = $this->users->login($request->validated(), 'admin');
+        dd($user);
 
         if (!$user) {
             return response()->json(['message' => 'Invalid admin credentials'], 401);
