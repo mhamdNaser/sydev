@@ -40,7 +40,6 @@ class UserRepository implements UserRepositoryInterface
 
     public function login(array $credentials, ?string $role = null): ?User
     {
-        dd($credentials);
         $query = User::query();
 
         if ($role === 'admin') {
@@ -50,6 +49,7 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $user = $query->where('email', $credentials['email'])->first();
+        dd($user);
 
         if ($user && Hash::check($credentials['password'], $user->password)) {
             return $user;
