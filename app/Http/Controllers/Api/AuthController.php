@@ -51,9 +51,9 @@ class AuthController extends Controller
         if (!$user) {
             return response()->json(['message' => 'Invalid admin credentials'], 401);
         }
+        dd($user);
 
         $token = $user->createToken('admin_token')->plainTextToken;
-        dd($token);
 
         return response()->json([
             'user' => new UserResource($user),
