@@ -54,10 +54,22 @@ class AuthController extends Controller
 
         $token = $user->createToken('admin_token')->plainTextToken;
 
+        // Store the token in a secure cookie
+        $cookie = cookie(
+            'ACCESS_TOKEN',          // Cookie name
+            $token,                  // Value
+            60 * 24,                 // Expiration in minutes (1 day)
+            '/',                     // Path
+            null,                    // Domain (null means current)
+            true,                    // Secure → requires HTTPS
+            true,                    // HttpOnly → not accessible via JS
+            false,                   // Raw
+            'Strict'                 // SameSite
+        );
+
         return response()->json([
-            'user' => new UserResource($user),
-            'token' => $token
-        ]);
+            'user' => new UserResource($user)
+        ])->cookie($cookie);
     }
 
     // ✅ Logout
