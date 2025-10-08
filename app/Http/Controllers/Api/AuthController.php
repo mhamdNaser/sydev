@@ -27,7 +27,7 @@ class AuthController extends Controller
     }
 
     // ✅ Login بدون سكوب (أي مستخدم)
-    public function login(LoginRequest $request)
+    public function userLogin(LoginRequest $request)
     {
         $user = $this->users->login($request->validated());
 
@@ -47,7 +47,6 @@ class AuthController extends Controller
     public function adminLogin(LoginRequest $request)
     {
         $user = $this->users->login($request->validated(), 'admin');
-        dd($user);
 
         if (!$user) {
             return response()->json(['message' => 'Invalid admin credentials'], 401);
