@@ -13,7 +13,7 @@ Route::get('/user', function (Request $request) {
 Route::post('login', [AuthController::class, 'login']);
 
 Route::prefix('admin')->group(function () {
-    Route::post('adminregister', [AuthController::class, 'adminregister']);
+    Route::post('adminregister', [AuthController::class, 'register']);
     Route::post('adminLogin', [AuthController::class, 'adminLogin']);
     Route::get('alladmin', [UserController::class, 'index'])->name('alladmin');
 

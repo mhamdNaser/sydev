@@ -46,6 +46,7 @@ class AuthController extends Controller
     // ✅ Login خاص بالأدمن فقط
     public function adminLogin(LoginRequest $request)
     {
+        dd("test");
         $user = $this->users->login($request->validated(), 'admin');
 
         if (!$user) {
