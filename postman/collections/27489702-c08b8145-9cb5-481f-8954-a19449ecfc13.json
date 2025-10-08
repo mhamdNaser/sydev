@@ -88,13 +88,11 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}/api/admin/adminLogin",
+							"raw": "{{baseURL}}admin/adminLogin",
 							"host": [
-								"{{baseURL}}"
+								"{{baseURL}}admin"
 							],
 							"path": [
-								"api",
-								"admin",
 								"adminLogin"
 							]
 						}
