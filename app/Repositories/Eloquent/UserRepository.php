@@ -40,6 +40,7 @@ class UserRepository implements UserRepositoryInterface
 
     public function login(array $credentials, ?string $role = null): ?User
     {
+        dd($credentials);
         $query = User::query();
 
         if ($role === 'admin') {
