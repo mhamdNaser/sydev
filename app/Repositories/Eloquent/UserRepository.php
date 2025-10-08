@@ -49,11 +49,11 @@ class UserRepository implements UserRepositoryInterface
         }
 
         $user = $query->where('email', $credentials['email'])->first();
-        dd($user);
 
         if ($user && Hash::check($credentials['password'], $user->password)) {
             return $user;
         }
+        dd($user);
 
         return null;
     }
