@@ -6,29 +6,26 @@ use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+// Route::get('/user', function (Request $request) {
+//     return $request->user();
+// })->middleware('auth:sanctum');
 
 
 Route::post('userLogin', [AuthController::class, 'userLogin']);
 
+// Public routes
 Route::prefix('admin')->group(function () {
     Route::post('adminregister', [AuthController::class, 'register']);
     Route::post('adminLogin', [AuthController::class, 'adminLogin']);
-    Route::get('alladmin', [UserController::class, 'index'])->name('alladmin');
+});
 
-    Route::middleware('auth:sanctum')->group(function () {
-
-        Route::get('/me', function (Request $request) {
-            if (!$request->user()) {
-                return response()->json(['error' => 'Unauthenticated'], 401);
-            }
-            return response()->json([
-                'user' => new UserResource($request->user())
-            ]);
-        });
-        
-        Route::post('logout', [AuthController::class, 'logout']);
+// Protected routes (Session-based)
+Route::middleware(['auth:sanctum'])->prefix('admin')->group(function () {
+    Route::get('me', function (Request $request) {
+        return response()->json([
+            'user' => new UserResource($request->user())
+        ]);
     });
+
+    Route::post('logout', [AuthController::class, 'logout']);
 });
