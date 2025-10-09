@@ -27,11 +27,12 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseURL}}admin/adminregister",
+							"raw": "{{baseURL}}/admin/adminregister",
 							"host": [
-								"{{baseURL}}admin"
+								"{{baseURL}}"
 							],
 							"path": [
+								"admin",
 								"adminregister"
 							]
 						}
