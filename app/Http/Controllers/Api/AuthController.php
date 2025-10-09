@@ -8,72 +8,98 @@ use App\Http\Requests\Admin\User\RegisterRequest;
 use App\Http\Requests\Admin\User\LoginRequest;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     public function __construct(private UserRepositoryInterface $users) {}
 
-    // ✅ Register
+    /**
+     * ✅ Register (API)
+     */
     public function register(RegisterRequest $request)
     {
         $user = $this->users->create($request->validated());
 
-        // تسجيل المستخدم مباشرة باستخدام session
-        Auth::login($user);
+        // إنشاء توكن مباشر بعد التسجيل
+        $token = $user->createToken('api_token')->plainTextToken;
 
         return response()->json([
-            'success' => true,
-            'user' => new UserResource($user)
+            'message' => 'Registered successfully',
+            'user' => new UserResource($user),
+            'token' => $token,
         ], 201);
     }
 
-    // ✅ Login بدون سكوب (أي مستخدم)
+    /**
+     * ✅ Login لأي مستخدم (Token-based)
+     */
     public function userLogin(LoginRequest $request)
     {
-        $user = $this->users->login($request->validated());
+        $credentials = $request->validated();
 
-        if (!$user) {
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        // تسجيل المستخدم في الجلسة
-        Auth::login($user);
+        // حذف التوكنات القديمة (اختياري)
+        $user->tokens()->delete();
+
+        // إنشاء توكن جديد
+        $token = $user->createToken('api_token')->plainTextToken;
 
         return response()->json([
-            'success' => true,
-            'user' => new UserResource($user)
+            'message' => 'Login successful',
+            'user' => new UserResource($user),
+            'token' => $token,
         ]);
     }
 
-    // ✅ Login خاص بالأدمن فقط
+    /**
+     * ✅ Login للأدمن فقط (Token-based)
+     */
     public function adminLogin(LoginRequest $request)
     {
-        $user = $this->users->login($request->validated(), 'admin');
+        $credentials = $request->validated();
 
-        if (!$user) {
-            return response()->json(['message' => 'Invalid admin credentials'], 401);
+        $user = User::where('email', $credentials['email'])->first();
+
+        if (!$user || !Hash::check($credentials['password'], $user->password)) {
+            return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        // تسجيل الأدمن في الجلسة
-        Auth::login($user);
+        if ($user->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $user->tokens()->delete();
+        $token = $user->createToken('admin_token')->plainTextToken;
 
         return response()->json([
-            'success' => true,
-            'message' => 'Login Successfully',
-            'user' => new UserResource($user)
+            'message' => 'Admin login successful',
+            'user' => new UserResource($user),
+            'token' => $token,
         ]);
     }
 
-    // ✅ Logout
+    /**
+     * ✅ Logout (Token-based)
+     */
     public function logout(Request $request)
     {
-        Auth::logout();
+        $request->user()->currentAccessToken()->delete();
 
-        // مسح الجلسة بالكامل
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        return response()->json(['message' => 'Logged out successfully']);
+    }
 
-        return response()->json(['success' => true, 'message' => 'Logged out successfully']);
+    /**
+     * ✅ Get Authenticated User
+     */
+    public function me(Request $request)
+    {
+        return new UserResource($request->user());
     }
 }
