@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Resources\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -18,6 +19,16 @@ Route::prefix('admin')->group(function () {
     Route::get('alladmin', [UserController::class, 'index'])->name('alladmin');
 
     Route::middleware('auth:sanctum')->group(function () {
+
+        Route::get('/me', function (Request $request) {
+            if (!$request->user()) {
+                return response()->json(['error' => 'Unauthenticated'], 401);
+            }
+            return response()->json([
+                'user' => new UserResource($request->user())
+            ]);
+        });
+        
         Route::post('logout', [AuthController::class, 'logout']);
     });
 });

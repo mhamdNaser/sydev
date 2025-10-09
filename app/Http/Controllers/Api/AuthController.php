@@ -61,7 +61,7 @@ class AuthController extends Controller
             60 * 24,                 // Expiration in minutes (1 day)
             '/',                     // Path
             null,                    // Domain (null means current)
-            true,                    // Secure → requires HTTPS
+            false,                    // Secure → requires HTTPS
             true,                    // HttpOnly → not accessible via JS
             false,                   // Raw
             'Strict'                 // SameSite
