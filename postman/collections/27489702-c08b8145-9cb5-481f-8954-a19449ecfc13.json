@@ -49,12 +49,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{baseURL}}/api/admin/alladmin",
+							"raw": "{{baseURL}}/admin/alladmin",
 							"host": [
 								"{{baseURL}}"
 							],
 							"path": [
-								"api",
 								"admin",
 								"alladmin"
 							]
