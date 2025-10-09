@@ -8,6 +8,7 @@ use App\Http\Requests\Admin\User\RegisterRequest;
 use App\Http\Requests\Admin\User\LoginRequest;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -18,11 +19,12 @@ class AuthController extends Controller
     {
         $user = $this->users->create($request->validated());
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // تسجيل المستخدم مباشرة باستخدام session
+        Auth::login($user);
 
         return response()->json([
-            'user' => new UserResource($user),
-            'token' => $token
+            'success' => true,
+            'user' => new UserResource($user)
         ], 201);
     }
 
@@ -35,11 +37,12 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        // تسجيل المستخدم في الجلسة
+        Auth::login($user);
 
         return response()->json([
-            'user' => new UserResource($user),
-            'token' => $token
+            'success' => true,
+            'user' => new UserResource($user)
         ]);
     }
 
@@ -52,32 +55,25 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid admin credentials'], 401);
         }
 
-        $token = $user->createToken('admin_token')->plainTextToken;
-
-        // Store the token in a secure cookie
-        $cookie = cookie(
-            'ACCESS_TOKEN',          // Cookie name
-            $token,                  // Value
-            60 * 24,                 // Expiration in minutes (1 day)
-            '/',                     // Path
-            null,             // Domain (null means current)
-            true,                   // Secure → requires HTTPS on real domain ..... false -> true
-            true,                    // HttpOnly → not accessible via JS
-            false,                   // Raw
-            'None'                    // SameSite on real domain ...... 'Lax' -> 'None'
-        );
+        // تسجيل الأدمن في الجلسة
+        Auth::login($user);
 
         return response()->json([
             'success' => true,
             'message' => 'Login Successfully',
             'user' => new UserResource($user)
-        ])->cookie($cookie);
+        ]);
     }
 
     // ✅ Logout
     public function logout(Request $request)
     {
-        $request->user()->tokens()->delete();
-        return response()->json(['message' => 'Logged out successfully']);
+        Auth::logout();
+
+        // مسح الجلسة بالكامل
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        return response()->json(['success' => true, 'message' => 'Logged out successfully']);
     }
 }
