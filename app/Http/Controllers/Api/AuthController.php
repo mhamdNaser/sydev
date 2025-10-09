@@ -60,11 +60,11 @@ class AuthController extends Controller
             $token,                  // Value
             60 * 24,                 // Expiration in minutes (1 day)
             '/',                     // Path
-            null,                    // Domain (null means current)
-            false,                    // Secure → requires HTTPS
+            'localhost',             // Domain (null means current)
+            false,                   // Secure → requires HTTPS on real domain ..... false -> true
             true,                    // HttpOnly → not accessible via JS
             false,                   // Raw
-            'Strict'                 // SameSite
+            'Lax'                    // SameSite on real domain ...... 'Lax' -> 'None'
         );
 
         return response()->json([
