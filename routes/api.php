@@ -1,13 +1,16 @@
 <?php
 
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserController;
-use App\Http\Resources\UserResource;
+use App\Http\Controllers\Api\LocaleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Laravel\Sanctum\Http\Controllers\CsrfCookieController;
 
 Route::post('userLogin', [AuthController::class, 'userLogin']);
+
+Route::get('/locale/{lang}', [LocaleController::class, 'setlocale']);
+Route::get('active-languages', [LanguageController::class, 'active'])->name('active-languages');
 
 Route::prefix('admin')->group(function () {
     Route::middleware('auth:sanctum')->get('/me', function (Request $request) {
