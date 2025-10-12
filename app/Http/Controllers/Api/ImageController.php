@@ -70,7 +70,7 @@ class ImageController extends Controller
 
             return response()->json([
                 'success' => true,
-                'url' => url('storage/' . $encodedPath)
+                'url' => storage_path('storage/' . $encodedPath)
             ]);
         } catch (\Exception $e) {
             return response()->json([
