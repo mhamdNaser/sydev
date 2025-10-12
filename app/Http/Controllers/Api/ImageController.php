@@ -21,7 +21,7 @@ class ImageController extends Controller
         $imageFile = $request->file('image');
         $format = $request->input('format');
 
-        // اختيار Driver تلقائيًا حسب توفر GD أو Imagick
+        // اختيار Driver تلقائيًا
         if (extension_loaded('gd')) {
             $driver = new GdDriver();
         } elseif (extension_loaded('imagick')) {
@@ -33,11 +33,12 @@ class ImageController extends Controller
             ], 500);
         }
 
-        // إنشاء ImageManager بالـ Driver المحدد
+        // إنشاء ImageManager
         $manager = new ImageManager($driver);
 
         try {
-            $image = $manager->make($imageFile->getPathname());
+            // قراءة الصورة باستخدام read() بدل make()
+            $image = $manager->read($imageFile->getPathname());
 
             $originalName = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
             $fileName = $originalName . '.' . $format;
@@ -46,7 +47,21 @@ class ImageController extends Controller
             Storage::disk('public')->makeDirectory('images/converted');
 
             // حفظ الصورة بالصيغة المطلوبة وجودة 90%
-            $image->save(storage_path('app/public/' . $savePath), 90, $format);
+            switch ($format) {
+                case 'jpg':
+                case 'jpeg':
+                    $image->toJpeg()->save(storage_path('app/public/' . $savePath), 90);
+                    break;
+                case 'png':
+                    $image->toPng()->save(storage_path('app/public/' . $savePath), 90);
+                    break;
+                case 'webp':
+                    $image->toWebp()->save(storage_path('app/public/' . $savePath), 90);
+                    break;
+                case 'gif':
+                    $image->toGif()->save(storage_path('app/public/' . $savePath));
+                    break;
+            }
 
             return response()->json([
                 'success' => true,
