@@ -21,7 +21,7 @@ class ImageController extends Controller
         $format = $request->input('format');
 
         // إنشاء ImageManager بدون Facade
-        $manager = new ImageManager('gd'); // لاحظ: string وليس array
+        $manager = new ImageManager('gd');
 
         /** @var InterventionImage $image */
         $image = $manager->make($imageFile->getPathname());
