@@ -76,12 +76,25 @@ class ImageController extends Controller
                 'success' => true,
                 'url' => $publicUrl,
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Error processing image: ' . $e->getMessage(),
             ], 500);
         }
+    }
+
+    public function download(Request $request, $fileName)
+    {
+        $filePath = public_path('images/converted/' . $fileName);
+
+        if (!file_exists($filePath)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found.'
+            ], 404);
+        }
+
+        return response()->download($filePath, $fileName);
     }
 }
