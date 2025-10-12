@@ -71,10 +71,6 @@ class AuthController extends Controller
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
-        if ($user->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
         $user->tokens()->delete();
         $token = $user->createToken('admin_token')->plainTextToken;
 

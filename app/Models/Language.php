@@ -16,13 +16,15 @@ class Language extends Model
     protected $fillable = [
         'code',
         'name',
-        'is_default',
-        'active',
+        'slug',
+        'default',
+        'status',
+        'direction'
     ];
 
     // الأعمدة التي يجب تحويلها لأنواع معينة
     protected $casts = [
-        'is_default' => 'boolean',
-        'active' => 'boolean',
+        'default' => 'boolean',
+        'status' => 'boolean',
     ];
 }

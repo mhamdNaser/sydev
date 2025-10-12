@@ -19,7 +19,6 @@ return new class extends Migration
             $table->string('last_name');
             $table->string('email')->unique();
             $table->bigInteger('phone')->unique();
-            $table->string('role')->comment('admin , user');
             $table->timestamp('email_verified_at')->nullable();
             $table->unsignedBigInteger('country_id')->nullable();
             $table->unsignedBigInteger('state_id')->nullable();
@@ -30,7 +29,7 @@ return new class extends Migration
             $table->string('address_3')->nullable();
             $table->string('image')->nullable();
             $table->boolean('status');
-            $table->boolean('is_active');
+            $table->boolean('is_active')->default(0);
             $table->rememberToken();
             $table->timestamps();
 
