@@ -4,13 +4,15 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Traits\ManageFiles;
 use Intervention\Image\ImageManager;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 
 class ImageController extends Controller
 {
+    use ManageFiles;
+
     public function convert(Request $request)
     {
         $request->validate([
@@ -22,60 +24,44 @@ class ImageController extends Controller
         $format = $request->input('format');
 
         // اختيار Driver تلقائيًا
-        if (extension_loaded('gd')) {
-            $driver = new GdDriver();
-        } elseif (extension_loaded('imagick')) {
-            $driver = new ImagickDriver();
-        } else {
-            return response()->json([
-                'success' => false,
-                'message' => 'No suitable image driver available on the server.'
-            ], 500);
-        }
-
-        // إنشاء ImageManager
+        $driver = extension_loaded('imagick') ? new ImagickDriver() : new GdDriver();
         $manager = new ImageManager($driver);
 
         try {
             // قراءة الصورة
             $image = $manager->read($imageFile->getPathname());
 
-            // إعادة تسمية الملف لتجنب المسافات والرموز الخاصة
+            // توليد اسم آمن للملف
             $originalName = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-            $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $originalName); // استبدل الرموز بـ _
-            $fileName = $safeName . '.' . $format;
+            $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', $originalName);
 
-            $savePath = 'images/converted/' . $fileName;
-            Storage::disk('public')->makeDirectory('images/converted');
+            // مسار التخزين داخل public
+            $directory = 'images/converted';
 
-            // حفظ الصورة بالصيغة المطلوبة وجودة 90%
-            switch ($format) {
-                case 'jpg':
-                case 'jpeg':
-                    $image->toJpeg()->save(storage_path('app/public/' . $savePath), 90);
-                    break;
-                case 'png':
-                    $image->toPng()->save(storage_path('app/public/' . $savePath), 90);
-                    break;
-                case 'webp':
-                    $image->toWebp()->save(storage_path('app/public/' . $savePath), 90);
-                    break;
-                case 'gif':
-                    $image->toGif()->save(storage_path('app/public/' . $savePath));
-                    break;
-            }
+            // تحويل الصورة حسب الصيغة المطلوبة
+            $convertedContent = match ($format) {
+                'jpg', 'jpeg' => $image->toJpeg(90)->encode(),
+                'png' => $image->toPng(90)->encode(),
+                'webp' => $image->toWebp(90)->encode(),
+                'gif' => $image->toGif()->encode(),
+                default => throw new \Exception('Unsupported format'),
+            };
 
-            // تشفير URL لتجنب مشاكل المسافات والرموز
-            $encodedPath = implode('/', array_map('rawurlencode', explode('/', $savePath)));
+            // رفع الصورة (فعليًا حفظها داخل public/)
+            $relativePath = $this->uploadFile($convertedContent, $directory, $safeName, $format);
+
+            // توليد رابط مباشر
+            $fullUrl = url($relativePath);
 
             return response()->json([
                 'success' => true,
-                'url' => storage_path('storage/' . $encodedPath)
-            ]);
+                'url' => $fullUrl,
+            ], 200, [], JSON_UNESCAPED_SLASHES);
+
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error processing image: ' . $e->getMessage()
+                'message' => 'Error processing image: ' . $e->getMessage(),
             ], 500);
         }
     }

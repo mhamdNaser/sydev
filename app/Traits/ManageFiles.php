@@ -2,44 +2,50 @@
 
 namespace App\Traits;
 
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\File;
 
 trait ManageFiles
 {
     /**
-     * Upload a file to the specified directory with a unique name.
+     * Upload file content to public directory with safe and unique name.
      *
-     * @param \Illuminate\Http\UploadedFile $file
-     * @param string $directory
-     * @param string $fileName
-     * @return string $filePath
+     * @param  string  $fileContent  محتوى الملف (ناتج encode)
+     * @param  string  $directory    مجلد التخزين داخل public (مثل: images/converted)
+     * @param  string  $fileName     الاسم الأساسي للملف بدون امتداد
+     * @param  string  $extension    الامتداد المطلوب (jpg, png, webp...)
+     * @return string  المسار الكامل داخل public
      */
-    public function uploadFile($file, $directory, $fileName)
+    public function uploadFile($fileContent, $directory, $fileName, $extension)
     {
-        // Create a unique file name using uniqid
-        $uniqueFileName = pathinfo($fileName, PATHINFO_FILENAME) . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        // إنشاء المجلد إذا لم يكن موجودًا
+        $destination = public_path($directory);
+        if (!File::exists($destination)) {
+            File::makeDirectory($destination, 0755, true);
+        }
 
-        // Specify the destination directory within the public disk
-        $destinationPath = public_path($directory);
+        // تنظيف الاسم وإنشاء اسم فريد
+        $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', pathinfo($fileName, PATHINFO_FILENAME));
+        $uniqueName = $safeName . '_' . uniqid() . '.' . $extension;
 
-        // Move the uploaded file to the destination directory
-        $file->move($destinationPath, $uniqueFileName);
+        // المسار الكامل داخل public
+        $fullPath = $destination . '/' . $uniqueName;
 
-        // Construct the image path
-        $filePath = $directory . '/' . $uniqueFileName;
+        // حفظ المحتوى كملف فعلي
+        File::put($fullPath, $fileContent);
 
-        return $filePath;
+        // المسار النسبي المستخدم بالرابط
+        return $directory . '/' . $uniqueName;
     }
 
     /**
-     * Delete a file from the specified path.
-     *
-     * @param string $filePath
-     * @return bool
+     * Delete a file from public folder
      */
     public function deleteFile($filePath)
     {
-        return File::delete(public_path($filePath));
+        $path = public_path($filePath);
+        if (File::exists($path)) {
+            return File::delete($path);
+        }
+        return false;
     }
 }
