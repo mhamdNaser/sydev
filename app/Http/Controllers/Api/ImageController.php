@@ -29,9 +29,7 @@ class ImageController extends Controller
 
         try {
             // إنشاء ImageManager مع التحقق من الـ driver
-            $manager = new ImageManager([
-                'driver' => 'gd'
-            ]);
+            $manager = new ImageManager('gd');
 
             $image = $manager->make($imageFile->getPathname());
 
