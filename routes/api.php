@@ -4,6 +4,8 @@ use App\Http\Controllers\Api\AdminRoleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\IconController;
+use App\Http\Controllers\Api\IconCtegoriesController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserController;
@@ -39,6 +41,22 @@ Route::prefix('admin')->group(function () {
 
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
+
+        Route::controller(IconController::class)->group(function () {
+            Route::get('icons', 'index');
+            Route::post('icons', 'store');
+            Route::put('icons/{id}', 'update');
+            Route::delete('icons/{id}', 'destroy');
+            Route::patch('icons/{id}/status', 'changeStatus');
+        });
+
+        Route::controller(IconCtegoriesController::class)->group(function () {
+            Route::get('icon-categories', 'index');
+            Route::post('icon-categories', 'store');
+            Route::put('icon-categories/{id}', 'update');
+            Route::delete('icon-categories/{id}', 'destroy');
+            Route::patch('icon-categories/{id}/status', 'changeStatus');
+        });
 
         Route::controller(CountryController::class)->group(function () {
             Route::get('all-countries', 'index')->name('all-countries');

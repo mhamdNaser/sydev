@@ -3,63 +3,47 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Icon\IconCategoryRequest;
+use App\Http\Resources\IconCategoryResource;
+use App\Repositories\Interfaces\IconCategoryRepositoryInterface;
 use Illuminate\Http\Request;
 
 class IconCtegoriesController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $repo;
+
+    public function __construct(IconCategoryRepositoryInterface $repo)
     {
-        //
+        $this->repo = $repo;
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function index(Request $request)
     {
-        //
+        $data = $this->repo->all($request->search, $request->rowsPerPage, $request->page);
+        return IconCategoryResource::collection($data);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(IconCategoryRequest $request)
     {
-        //
+        $category = $this->repo->create($request->validated());
+        return new IconCategoryResource($category);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(IconCategoryRequest $request, $id)
     {
-        //
+        $category = $this->repo->update($id, $request->validated());
+        return new IconCategoryResource($category);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
+        $this->repo->delete($id);
+        return response()->json(['success' => true, 'message' => 'Category deleted successfully.']);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function changeStatus($id)
     {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $category = $this->repo->changeStatus($id);
+        return new IconCategoryResource($category);
     }
 }

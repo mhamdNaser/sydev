@@ -3,63 +3,47 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\Icon\StoreIconRequest;
+use App\Repositories\Interfaces\IconRepositoryInterface;
 use Illuminate\Http\Request;
 
 class IconController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    protected $repo;
+
+    public function __construct(IconRepositoryInterface $repo)
+    {
+        $this->repo = $repo;
+    }
+
     public function index()
     {
-        //
+        return response()->json($this->repo->all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show($id)
     {
-        //
+        return response()->json($this->repo->find($id));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function store(StoreIconRequest $request)
     {
-        //
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
+        $icon = $this->repo->create($data);
+        return response()->json($icon, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function update(StoreIconRequest $request, $id)
     {
-        //
+        $data = $request->validated();
+        $icon = $this->repo->update($id, $data);
+        return response()->json($icon);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function destroy($id)
     {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $this->repo->delete($id);
+        return response()->json(['message' => 'Icon deleted successfully']);
     }
 }
