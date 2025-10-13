@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\AdminRoleController;
+use App\Http\Controllers\Api\AdminRoleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CountryController;
