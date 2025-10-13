@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdminRoleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CountryController;
@@ -65,6 +66,17 @@ Route::prefix('admin')->group(function () {
             Route::get('delete-city/{id}', 'destroy')->name('delete-city');
             Route::post('delete-cities', 'destroyarray')->name('delete-cities');
         });
+
+        Route::controller(AdminRoleController::class)->middleware('auth:sanctum')->group(function () {
+            Route::get('/roles', 'index');       // get all roles (with pagination)
+            Route::post('/roles', 'store');       // create role
+            Route::get('/roles/{id}', 'show');    // show one role
+            Route::put('/roles/{id}', 'update');  // update role
+            Route::delete('/roles/{id}',  'destroy'); // delete role
+            Route::patch('/roles/{id}/status', 'changeStatus'); // toggle status
+        });
+
+
 
         Route::controller(LanguageController::class)->group(function () {
             Route::get('all-languages', 'index')->name('all-languages');
