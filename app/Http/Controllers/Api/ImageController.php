@@ -70,7 +70,7 @@ class ImageController extends Controller
             $encodedImage->save($savePath);
 
             // إنشاء URL عام
-            $publicUrl = url('images/converted/' . rawurlencode($fileName));
+            $publicUrl = 'images/converted/' . rawurlencode($fileName);
 
             return response()->json([
                 'success' => true,
@@ -82,19 +82,5 @@ class ImageController extends Controller
                 'message' => 'Error processing image: ' . $e->getMessage(),
             ], 500);
         }
-    }
-
-    public function download(Request $request, $fileName)
-    {
-        $filePath = public_path('images/converted/' . $fileName);
-
-        if (!file_exists($filePath)) {
-            return response()->json([
-                'success' => false,
-                'message' => 'File not found.'
-            ], 404);
-        }
-
-        return response()->download($filePath, $fileName);
     }
 }
