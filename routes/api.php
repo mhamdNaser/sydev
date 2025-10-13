@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::post('/convert-image', [ImageController::class, 'convert']);
-Route::get('/download-image/{fileName}', [ImageController::class, 'download']);
+Route::get('/download-image/{fileName}', [ImageController::class, 'ImageDownload'])->name('download-image');
 
 Route::get('/locale/{lang}', [LocaleController::class, 'setlocale']);
 Route::get('active-languages', [LanguageController::class, 'active'])->name('active-languages');

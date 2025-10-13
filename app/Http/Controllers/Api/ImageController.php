@@ -85,7 +85,7 @@ class ImageController extends Controller
         }
     }
 
-    public function download($fileName)
+    public function ImageDownload($fileName)
     {
         $path = public_path('images/converted/' . $fileName);
 
