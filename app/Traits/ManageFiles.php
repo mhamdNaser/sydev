@@ -16,26 +16,20 @@ trait ManageFiles
      * @return string  المسار الكامل داخل public
      */
     public function uploadFile($fileContent, $directory, $fileName, $extension)
-    {
-        // إنشاء المجلد إذا لم يكن موجودًا
-        $destination = public_path($directory);
-        if (!File::exists($destination)) {
-            File::makeDirectory($destination, 0755, true);
-        }
-
-        // تنظيف الاسم وإنشاء اسم فريد
-        $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', pathinfo($fileName, PATHINFO_FILENAME));
-        $uniqueName = $safeName . '_' . uniqid() . '.' . $extension;
-
-        // المسار الكامل داخل public
-        $fullPath = $destination . '/' . $uniqueName;
-
-        // حفظ المحتوى كملف فعلي
-        File::put($fullPath, $fileContent);
-
-        // المسار النسبي المستخدم بالرابط
-        return $directory . '/' . $uniqueName;
+{
+    $destination = public_path($directory);
+    if (!\Illuminate\Support\Facades\File::exists($destination)) {
+        \Illuminate\Support\Facades\File::makeDirectory($destination, 0755, true);
     }
+
+    $safeName = preg_replace('/[^A-Za-z0-9_\-]/', '_', pathinfo($fileName, PATHINFO_FILENAME));
+    $uniqueName = $safeName . '_' . uniqid() . '.' . $extension;
+
+    $fullPath = $destination . '/' . $uniqueName;
+    \Illuminate\Support\Facades\File::put($fullPath, $fileContent);
+
+    return $directory . '/' . $uniqueName;
+}
 
     /**
      * Delete a file from public folder
