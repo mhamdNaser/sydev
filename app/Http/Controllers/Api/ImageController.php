@@ -97,7 +97,8 @@ class ImageController extends Controller
         }
 
         return response()->download($path, $fileName, [
-            'Content-Type' => mime_content_type($path)
+            'Content-Type' => mime_content_type($path),
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 }
