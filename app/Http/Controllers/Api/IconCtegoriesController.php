@@ -23,6 +23,12 @@ class IconCtegoriesController extends Controller
         return IconCategoryResource::collection($data);
     }
 
+    public function allWithoutPagination()
+    {
+        $categories = $this->repo->allWithoutPagination();
+        return response()->json($categories);
+    }
+
     public function store(IconCategoryRequest $request)
     {
         $category = $this->repo->create($request->validated());

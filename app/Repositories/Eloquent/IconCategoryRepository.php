@@ -18,6 +18,13 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
         return $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
     }
 
+    public function allWithoutPagination()
+    {
+        return IconCategories::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+
     public function find($id)
     {
         return IconCategories::findOrFail($id);
@@ -50,4 +57,3 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
         return $category;
     }
 }
-
