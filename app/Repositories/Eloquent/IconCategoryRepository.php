@@ -5,24 +5,30 @@ namespace App\Repositories\Eloquent;
 use App\Models\IconCategories;
 use App\Repositories\Interfaces\IconCategoryRepositoryInterface;
 use App\Traits\PaginatesCollection;
+use Illuminate\Support\Facades\Cache;
 
 class IconCategoryRepository implements IconCategoryRepositoryInterface
 {
 
     use PaginatesCollection;
 
-    public function all($search = null, $rowsPerPage = 10, $page = 1)
+     public function all($search = null, $rowsPerPage = 10, $page = 1)
     {
-        $query = IconCategories::query();
+        $cacheKey = "icon_categories_all";
 
+        // نحصل على كل البيانات من الكاش أو قاعدة البيانات
+        $items = Cache::remember($cacheKey, 60, function () {
+            return IconCategories::orderBy('id', 'desc')->get();
+        });
+
+        // تطبيق الفلترة على الكولكشن
         if ($search) {
-            $query->where('name', 'like', "%{$search}%");
+            $items = $items->filter(function ($item) use ($search) {
+                return stripos($item->name, $search) !== false;
+            });
         }
 
-        // نحصل على كل العناصر كـ Collection
-        $items = $query->orderBy('id', 'desc')->get();
-
-        // نستخدم التريت لتقسيمها يدويًا
+        // استخدام التريت لتطبيق الباجنيشن
         return $this->paginate($items, $rowsPerPage, $page);
     }
 
