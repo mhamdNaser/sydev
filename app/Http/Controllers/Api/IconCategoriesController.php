@@ -8,7 +8,7 @@ use App\Http\Resources\IconCategoryResource;
 use App\Repositories\Interfaces\IconCategoryRepositoryInterface;
 use Illuminate\Http\Request;
 
-class IconCtegoriesController extends Controller
+class IconCategoriesController extends Controller
 {
     protected $repo;
 

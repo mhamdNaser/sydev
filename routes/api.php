@@ -5,7 +5,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CountryController;
 use App\Http\Controllers\Api\IconController;
-use App\Http\Controllers\Api\IconCtegoriesController;
+use App\Http\Controllers\Api\IconCategoriesController;
 use App\Http\Controllers\Api\ImageController;
 use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserController;
@@ -50,7 +50,7 @@ Route::prefix('admin')->group(function () {
             Route::patch('icons/{id}/status', 'changeStatus');
         });
 
-        Route::controller(IconCtegoriesController::class)->group(function () {
+        Route::controller(IconCategoriesController::class)->group(function () {
             Route::get('icon-categories', 'index');
             Route::get('icon-categories/all', 'allWithoutPagination');
             Route::post('icon-categories', 'store');
