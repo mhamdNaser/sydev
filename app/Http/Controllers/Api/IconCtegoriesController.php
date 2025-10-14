@@ -19,11 +19,11 @@ class IconCtegoriesController extends Controller
 
     public function index(Request $request)
     {
-        $perPage = $request->rowsPerPage ?? 10;
-        $page = $request->page ?? 1;
-        $search = $request->search;
+        $search = $request->input('search');
+        $rowsPerPage = $request->input('rowsPerPage', 10);
+        $page = $request->input('page', 1);
 
-        $result = $this->repo->all($search, $perPage, $page);
+        $result = $this->repo->all($search, $rowsPerPage, $page);
 
         return response()->json([
             'data' => IconCategoryResource::collection($result['data']),

@@ -11,7 +11,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
 
     use PaginatesCollection;
 
-    public function all($search = null, $perPage = 10, $page = 1)
+    public function all($search = null, $rowsPerPage = 10, $page = 1)
     {
         $query = IconCategories::query();
 
@@ -23,7 +23,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
         $items = $query->orderBy('id', 'desc')->get();
 
         // نستخدم التريت لتقسيمها يدويًا
-        return $this->paginate($items, $perPage, $page);
+        return $this->paginate($items, $rowsPerPage, $page);
     }
 
     public function allWithoutPagination()
