@@ -6,10 +6,12 @@ use App\Repositories\Eloquent\UserRepository;
 use App\Repositories\Eloquent\LanguageRepository;
 use App\Repositories\Eloquent\AdminRoleRepository;
 use App\Repositories\Eloquent\IconRepository;
+use App\Repositories\Eloquent\IconCategoryRepository;
 use App\Repositories\Interfaces\UserRepositoryInterface;
 use App\Repositories\Interfaces\LanguageRepositoryInterface;
 use App\Repositories\Interfaces\AdminRoleRepositoryInterface;
 use App\Repositories\Interfaces\IconRepositoryInterface;
+use App\Repositories\Interfaces\IconCategoryRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -23,6 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(LanguageRepositoryInterface::class, LanguageRepository::class);
         $this->app->bind(AdminRoleRepositoryInterface::class, AdminRoleRepository::class);
         $this->app->bind(IconRepositoryInterface::class,IconRepository::class);
+        $this->app->bind(IconCategoryRepositoryInterface::class, IconCategoryRepository::class);
     }
 
     /**
