@@ -19,8 +19,17 @@ class IconCtegoriesController extends Controller
 
     public function index(Request $request)
     {
-        $data = $this->repo->all($request->search, $request->rowsPerPage, $request->page);
-        return IconCategoryResource::collection($data);
+        $perPage = $request->rowsPerPage ?? 10;
+        $page = $request->page ?? 1;
+        $search = $request->search;
+
+        $result = $this->repo->all($search, $perPage, $page);
+
+        return response()->json([
+            'data' => IconCategoryResource::collection($result['data']),
+            'meta' => $result['meta'],
+            'links' => $result['links'],
+        ]);
     }
 
     public function allWithoutPagination()

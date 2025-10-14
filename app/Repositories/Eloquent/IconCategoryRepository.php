@@ -4,9 +4,13 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\IconCategories;
 use App\Repositories\Interfaces\IconCategoryRepositoryInterface;
+use App\Traits\PaginatesCollection;
 
 class IconCategoryRepository implements IconCategoryRepositoryInterface
 {
+
+    use PaginatesCollection;
+
     public function all($search = null, $perPage = 10, $page = 1)
     {
         $query = IconCategories::query();
@@ -15,7 +19,11 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
             $query->where('name', 'like', "%{$search}%");
         }
 
-        return $query->orderBy('id', 'desc')->paginate($perPage, ['*'], 'page', $page);
+        // نحصل على كل العناصر كـ Collection
+        $items = $query->orderBy('id', 'desc')->get();
+
+        // نستخدم التريت لتقسيمها يدويًا
+        return $this->paginate($items, $perPage, $page);
     }
 
     public function allWithoutPagination()
