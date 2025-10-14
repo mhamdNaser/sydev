@@ -26,11 +26,7 @@ class IconCtegoriesController extends Controller
     public function store(IconCategoryRequest $request)
     {
         $category = $this->repo->create($request->validated());
-        return response()->json([
-            "success" => true,
-            'message' => 'Admin login successful',
-            'data' => new IconCategoryResource($category)
-        ]);
+        return response()->json(['message' => 'Icon created successfully'], 201);
     }
 
     public function update(IconCategoryRequest $request, $id)
