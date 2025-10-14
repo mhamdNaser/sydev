@@ -27,8 +27,9 @@ class IconCtegoriesController extends Controller
     {
         $category = $this->repo->create($request->validated());
         return response()->json([
+            "success" => true,
             'message' => 'Admin login successful',
-            'user' => new IconCategoryResource($category)
+            'data' => new IconCategoryResource($category)
         ]);
     }
 
