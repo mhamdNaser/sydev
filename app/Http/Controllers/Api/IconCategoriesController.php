@@ -26,7 +26,7 @@ class IconCategoriesController extends Controller
         $result = $this->repo->all($search, $rowsPerPage, $page);
 
         return response()->json([
-            'data' => IconCategoryResource::collection($result['data']),
+            'categories' => IconCategoryResource::collection($result['data']),
             'meta' => $result['meta'],
             'links' => $result['links'],
         ]);
