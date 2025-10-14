@@ -51,7 +51,7 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::controller(IconCategoriesController::class)->group(function () {
-            Route::get('icon-categories', 'index');
+            Route::post('icon-categories', 'index');
             Route::get('icon-categories/all', 'allWithoutPagination');
             Route::post('icon-categories', 'store');
             Route::put('icon-categories/{id}', 'update');
