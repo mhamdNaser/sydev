@@ -87,7 +87,7 @@ class ImageController extends Controller
 
     public function download($fileName)
     {
-        $path = public_path('images/converted/' . $fileName);
+        $path = 'images/converted/' . $fileName;
 
         if (!file_exists($path)) {
             return response()->json([
@@ -98,7 +98,6 @@ class ImageController extends Controller
 
         return response()->download($path, $fileName, [
             'Content-Type' => mime_content_type($path),
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 }
