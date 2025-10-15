@@ -37,7 +37,8 @@ class IconRepository implements IconRepositoryInterface
         // تطبيق الفلترة على الكولكشن
         if ($search) {
             $items = $items->filter(function ($item) use ($search) {
-                return stripos($item->name, $search) !== false;
+                return stripos($item->title, $search) !== false;
+                return stripos($item->description, $search) !== false;
             });
         }
 
