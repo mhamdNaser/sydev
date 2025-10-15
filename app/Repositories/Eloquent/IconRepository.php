@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories\Eloquent;
+
 use App\Repositories\Interfaces\IconRepositoryInterface;
 use App\Models\Icon;
 
@@ -25,6 +26,7 @@ class IconRepository implements IconRepositoryInterface
 
     public function create(array $data)
     {
+        // الآن الحقل 'file' أو 'icon_text' مخزن كنص مباشرة
         return $this->model->create($data);
     }
 
@@ -39,5 +41,13 @@ class IconRepository implements IconRepositoryInterface
     {
         $icon = $this->find($id);
         return $icon->delete();
+    }
+
+    public function toggleStatus(int $id)
+    {
+        $icon = $this->find($id);
+        $icon->is_active = !$icon->is_active;
+        $icon->save();
+        return $icon;
     }
 }

@@ -16,34 +16,58 @@ class IconController extends Controller
         $this->repo = $repo;
     }
 
-    public function index()
+    public function index(Request $request)
     {
+        // يمكن إضافة pagination لاحقاً
         return response()->json($this->repo->all());
-    }
-
-    public function show($id)
-    {
-        return response()->json($this->repo->find($id));
     }
 
     public function store(StoreIconRequest $request)
     {
         $data = $request->validated();
         $data['user_id'] = auth()->id();
+
+        // الآن نحفظ النص مباشرة
+        // تأكد أن الحقل في الموديل: 'file' أو 'icon_text' نصي (TEXT)
         $icon = $this->repo->create($data);
-        return response()->json($icon, 201);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Icon created successfully',
+            'data' => $icon
+        ], 201);
     }
 
     public function update(StoreIconRequest $request, $id)
     {
         $data = $request->validated();
         $icon = $this->repo->update($id, $data);
-        return response()->json($icon);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Icon updated successfully',
+            'data' => $icon
+        ]);
     }
 
     public function destroy($id)
     {
         $this->repo->delete($id);
-        return response()->json(['message' => 'Icon deleted successfully']);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Icon deleted successfully'
+        ]);
+    }
+
+    public function changeStatus($id)
+    {
+        $icon = $this->repo->toggleStatus($id);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Status changed successfully',
+            'data' => $icon
+        ]);
     }
 }

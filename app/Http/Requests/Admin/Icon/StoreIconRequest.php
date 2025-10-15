@@ -21,7 +21,6 @@ class StoreIconRequest extends FormRequest
             'tags' => 'nullable|array',
             'tags.*' => 'string',
             'is_active' => 'boolean',
-            'file' => 'required|string', // هنا تخزين الكود مباشرة
         ];
     }
 }
