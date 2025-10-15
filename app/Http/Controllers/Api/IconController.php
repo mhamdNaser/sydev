@@ -41,7 +41,7 @@ class IconController extends Controller
 
     public function download($fileName)
     {
-        $path = url('icons/' . $fileName);
+        $path = url('public/icons/' . $fileName);
 
         if (!file_exists($path)) {
             return response()->json([
