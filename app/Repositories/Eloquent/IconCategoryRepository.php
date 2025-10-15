@@ -46,11 +46,13 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
 
     public function create(array $data)
     {
+        Cache::forget('icon_categories_all');
         return IconCategories::create($data);
     }
 
     public function update($id, array $data)
     {
+        Cache::forget('icon_categories_all');
         $category = $this->find($id);
         $category->update($data);
         return $category;
@@ -58,6 +60,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
 
     public function delete($id)
     {
+        Cache::forget('icon_categories_all');
         $category = $this->find($id);
         $category->delete();
         return true;
@@ -65,6 +68,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
 
     public function changeStatus($id)
     {
+        Cache::forget('icon_categories_all');
         $category = $this->find($id);
         $category->is_active = !$category->is_active;
         $category->save();
