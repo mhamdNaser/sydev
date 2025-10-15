@@ -46,7 +46,8 @@ class IconController extends Controller
         if (!file_exists($path)) {
             return response()->json([
                 'success' => false,
-                'message' => 'File not found.'
+                'message' => 'File not found.',
+                'test' => $path
             ], 404);
         }
 
