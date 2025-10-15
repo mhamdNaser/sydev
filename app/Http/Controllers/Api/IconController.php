@@ -27,8 +27,6 @@ class IconController extends Controller
         $data = $request->validated();
         $data['user_id'] = auth()->id();
 
-        // الآن نحفظ النص مباشرة
-        // تأكد أن الحقل في الموديل: 'file' أو 'icon_text' نصي (TEXT)
         $icon = $this->repo->create($data);
 
         return response()->json([
