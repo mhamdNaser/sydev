@@ -69,13 +69,16 @@ class IconRepository implements IconRepositoryInterface
 
         $data['file_svg'] = $svgPath;
         $data['file_png'] = $pngPath;
+
         unset($data['icon_text']);
 
+        Cache::forget('icon_all');
         return $this->model->create($data);
     }
 
     public function update(int $id, array $data)
     {
+        Cache::forget('icon_all');
         $icon = $this->find($id);
         $icon->update($data);
         return $icon;
@@ -83,12 +86,14 @@ class IconRepository implements IconRepositoryInterface
 
     public function delete(int $id)
     {
+        Cache::forget('icon_all');
         $icon = $this->find($id);
         return $icon->delete();
     }
 
     public function toggleStatus(int $id)
     {
+        Cache::forget('icon_all');
         $icon = $this->find($id);
         $icon->is_active = !$icon->is_active;
         $icon->save();
