@@ -50,9 +50,9 @@ class IconController extends Controller
             ], 404);
         }
 
+        // نرسل الملف مباشرة باسم الملف الأصلي
         return response()->download($path, $fileName, [
             'Content-Type' => mime_content_type($path),
-            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
         ]);
     }
 
