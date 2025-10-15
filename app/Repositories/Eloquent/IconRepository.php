@@ -27,7 +27,7 @@ class IconRepository implements IconRepositoryInterface
 
     public function all($search = null, $rowsPerPage = 10, $page = 1)
     {
-        $cacheKey = "icon_categories_all";
+        $cacheKey = "icon_all";
 
         // نحصل على كل البيانات من الكاش أو قاعدة البيانات
         $items = Cache::remember($cacheKey, 60, function () {
