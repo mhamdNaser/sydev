@@ -49,10 +49,11 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
         Cache::forget('icon_categories_all');
         return IconCategories::create($data);
     }
-
+    
     public function update($id, array $data)
     {
         Cache::forget('icon_categories_all');
+
         $category = $this->find($id);
         $category->update($data);
         return $category;
