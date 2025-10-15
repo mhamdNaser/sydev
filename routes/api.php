@@ -28,6 +28,10 @@ Route::get('all-countries', [CountryController::class, 'index'])->name('site-cou
 Route::get('all-states', [StateController::class, 'index'])->name('site-states');
 Route::get('all-cities', [CityController::class, 'index'])->name('site-cities');
 
+Route::controller(IconController::class)->group(function () {
+    Route::get('allicons/WithoutPagination', 'allWithoutPagination');
+});
+
 Route::post('userLogin', [AuthController::class, 'userLogin']);
 
 Route::prefix('admin')->group(function () {
