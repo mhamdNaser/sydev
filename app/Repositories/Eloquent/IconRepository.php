@@ -10,10 +10,13 @@ use Intervention\Image\Encoders\PngEncoder;
 use Illuminate\Support\Str;
 use App\Models\Icon;
 use App\Traits\ManageFiles;
+use App\Traits\PaginatesCollection;
+use Illuminate\Support\Facades\Cache;
 
 class IconRepository implements IconRepositoryInterface
 {
     use ManageFiles;
+    use PaginatesCollection;
 
     protected $model;
 
@@ -22,9 +25,24 @@ class IconRepository implements IconRepositoryInterface
         $this->model = $icon;
     }
 
-    public function all()
+    public function all($search = null, $rowsPerPage = 10, $page = 1)
     {
-        return $this->model->with('category', 'user')->get();
+        $cacheKey = "icon_categories_all";
+
+        // نحصل على كل البيانات من الكاش أو قاعدة البيانات
+        $items = Cache::remember($cacheKey, 60, function () {
+            return Icon::orderBy('id', 'desc')->get();
+        });
+
+        // تطبيق الفلترة على الكولكشن
+        if ($search) {
+            $items = $items->filter(function ($item) use ($search) {
+                return stripos($item->name, $search) !== false;
+            });
+        }
+
+        // استخدام التريت لتطبيق الباجنيشن
+        return $this->paginate($items, $rowsPerPage, $page);
     }
 
     public function find(int $id)
