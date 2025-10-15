@@ -43,7 +43,7 @@ Route::prefix('admin')->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
 
         Route::controller(IconController::class)->group(function () {
-            Route::get('icons', 'index');
+            Route::post('allicons', 'index');
             Route::post('icons', 'store');
             Route::put('icons/{id}', 'update');
             Route::delete('icons/{id}', 'destroy');
