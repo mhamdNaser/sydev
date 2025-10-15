@@ -35,18 +35,18 @@ class IconRepository implements IconRepositoryInterface
     public function create(array $data)
     {
         $slug = Str::slug($data['title']);
-        $storagePath = public_path('storage/icons');
+        $storagePath = public_path('icons');
         if (!file_exists($storagePath)) mkdir($storagePath, 0755, true);
 
         // حفظ SVG كنص
-        $svgPath = $this->uploadFile($data['icon_text'], 'storage/icons', $slug, 'svg');
+        $svgPath = $this->uploadFile($data['icon_text'], 'icons', $slug, 'svg');
 
         // تحويل SVG إلى PNG
         $driver = extension_loaded('imagick') ? new ImagickDriver() : new GdDriver();
         $manager = new ImageManager($driver);
         $image = $manager->read($data['icon_text']); // قراءة الـ SVG
         $encoded = $image->encode(new PngEncoder());
-        $pngPath = $this->uploadFile($encoded, 'storage/icons', $slug, 'png');
+        $pngPath = $this->uploadFile($encoded, 'icons', $slug, 'png');
 
         $data['file_svg'] = $svgPath;
         $data['file_png'] = $pngPath;
