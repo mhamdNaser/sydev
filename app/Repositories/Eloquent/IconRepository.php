@@ -48,9 +48,7 @@ class IconRepository implements IconRepositoryInterface
 
      public function allWithoutPagination()
     {
-        return Icon::select('id', 'name')
-            ->orderBy('name', 'asc')
-            ->get();
+        return Icon::all();
     }
 
     public function find(int $id)
