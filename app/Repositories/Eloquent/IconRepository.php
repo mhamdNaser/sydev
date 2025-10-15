@@ -46,6 +46,13 @@ class IconRepository implements IconRepositoryInterface
         return $this->paginate($items, $rowsPerPage, $page);
     }
 
+     public function allWithoutPagination()
+    {
+        return Icon::select('id', 'name')
+            ->orderBy('name', 'asc')
+            ->get();
+    }
+
     public function find(int $id)
     {
         return $this->model->with('category', 'user')->findOrFail($id);

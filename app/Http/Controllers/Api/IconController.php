@@ -32,6 +32,12 @@ class IconController extends Controller
         ]);
     }
 
+    public function allWithoutPagination()
+    {
+        $categories = $this->repo->allWithoutPagination();
+        return response()->json($categories);
+    }
+
     public function store(StoreIconRequest $request)
     {
         $data = $request->validated();

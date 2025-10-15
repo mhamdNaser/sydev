@@ -5,6 +5,7 @@ namespace App\Repositories\Interfaces;
 interface IconRepositoryInterface
 {
     public function all();
+    public function allWithoutPagination();
     public function find(int $id);
     public function create(array $data);
     public function update(int $id, array $data);
