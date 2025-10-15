@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('icons', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->longText('file_svg');
+            $table->longText('file_png');
             $table->text('description')->nullable();
             $table->foreignId('category_id')->constrained('icon_categories')->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');

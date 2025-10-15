@@ -18,7 +18,8 @@ class Icon extends Model
         'download_count',
         'tags',
         'is_active',
-        'file', // هذا الحقل لتخزين SVG أو Base64
+        'file_svg',
+        'file_png'
     ];
 
     protected $casts = [
