@@ -38,6 +38,24 @@ class IconController extends Controller
         return response()->json($categories);
     }
 
+
+    public function download($fileName)
+    {
+        $path = public_path('images/' . $fileName);
+
+        if (!file_exists($path)) {
+            return response()->json([
+                'success' => false,
+                'message' => 'File not found.'
+            ], 404);
+        }
+
+        return response()->download($path, $fileName, [
+            'Content-Type' => mime_content_type($path),
+            'Content-Disposition' => 'attachment; filename="' . $fileName . '"',
+        ]);
+    }
+
     public function store(StoreIconRequest $request)
     {
         $data = $request->validated();
