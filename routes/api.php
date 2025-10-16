@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\LanguageController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\LocaleController;
 use App\Http\Controllers\Api\StateController;
+use App\Http\Controllers\Api\IconDownloadCopyController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -27,11 +28,12 @@ Route::get('alladmin', [UserController::class, 'index'])->name('alladmin');
 Route::get('all-countries', [CountryController::class, 'index'])->name('site-countries');
 Route::get('all-states', [StateController::class, 'index'])->name('site-states');
 Route::get('all-cities', [CityController::class, 'index'])->name('site-cities');
+Route::get('allicons/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('WithoutPagination');
 
-Route::controller(IconController::class)->group(function () {
-    Route::get('allicons/WithoutPagination', 'allWithoutPagination');
+Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/download-icon/{fileName}', 'download');
-    Route::get('/get-icon-code/{fileName}', 'getIconCode');
+    Route::get('/get-icon-svg/{fileName}', 'getIconCode');
+    Route::get('/get-icon-jsx/{fileName}', 'getIconCodeJsx');
 });
 
 Route::post('userLogin', [AuthController::class, 'userLogin']);
