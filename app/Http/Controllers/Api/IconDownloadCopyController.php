@@ -72,12 +72,17 @@ class IconDownloadCopyController extends Controller
 
         if ($extension === 'svg') {
             $content = file_get_contents($path);
+
+            // تحويل SVG إلى JSX
+            $jsxContent = $this->convertSvgToJsx($content);
+
             return response()->json([
                 'success' => true,
-                'type' => 'svg',
-                'code' => $content,
+                'type' => 'jsx',
+                'code' => $jsxContent,
             ]);
         } else {
+            // للصور الأخرى (PNG، JPG...) نرسل Base64
             $data = base64_encode(file_get_contents($path));
             $mime = mime_content_type($path);
             $base64String = "data:$mime;base64,$data";
@@ -88,5 +93,37 @@ class IconDownloadCopyController extends Controller
                 'code' => $base64String,
             ]);
         }
+    }
+
+
+    private function convertSvgToJsx(string $svgContent, array $customMap = []): string
+    {
+        $defaultMap = [
+            'stroke-width' => 'strokeWidth',
+            'stroke-linecap' => 'strokeLinecap',
+            'stroke-linejoin' => 'strokeLinejoin',
+            'class=' => 'className=',
+            'fill-rule' => 'fillRule',
+            'clip-rule' => 'clipRule',
+            // يمكنك إضافة خصائص إضافية هنا
+        ];
+
+        $map = array_merge($defaultMap, $customMap);
+
+        foreach ($map as $svgAttr => $jsxAttr) {
+            $svgContent = preg_replace_callback("/$svgAttr\s*=\s*(['\"])(.*?)\\1/", function ($matches) use ($jsxAttr) {
+                $quote = $matches[1];
+                $value = $matches[2];
+
+                // إذا القيمة رقمية، نضعها في {} كما في JSX
+                if (is_numeric($value)) {
+                    return $jsxAttr . "={" . $value . "}";
+                }
+
+                return $jsxAttr . "=" . $quote . $value . $quote;
+            }, $svgContent);
+        }
+
+        return $svgContent;
     }
 }
