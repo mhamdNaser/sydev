@@ -102,26 +102,28 @@ class IconDownloadCopyController extends Controller
             'stroke-width' => 'strokeWidth',
             'stroke-linecap' => 'strokeLinecap',
             'stroke-linejoin' => 'strokeLinejoin',
-            'class=' => 'className=',
+            'class' => 'className',
             'fill-rule' => 'fillRule',
             'clip-rule' => 'clipRule',
-            // يمكنك إضافة خصائص إضافية هنا
         ];
 
         $map = array_merge($defaultMap, $customMap);
 
         foreach ($map as $svgAttr => $jsxAttr) {
-            $svgContent = preg_replace_callback("/$svgAttr\s*=\s*(['\"])(.*?)\\1/", function ($matches) use ($jsxAttr) {
-                $quote = $matches[1];
-                $value = $matches[2];
+            $svgContent = preg_replace_callback(
+                "/\b$svgAttr\s*=\s*(['\"])(.*?)\\1/",
+                function ($matches) use ($jsxAttr) {
+                    $quote = $matches[1];
+                    $value = $matches[2];
 
-                // إذا القيمة رقمية، نضعها في {} كما في JSX
-                if (is_numeric($value)) {
-                    return $jsxAttr . "={" . $value . "}";
-                }
+                    if (is_numeric($value)) {
+                        return $jsxAttr . "={" . $value . "}";
+                    }
 
-                return $jsxAttr . "=" . $quote . $value . $quote;
-            }, $svgContent);
+                    return $jsxAttr . "=" . $quote . $value . $quote;
+                },
+                $svgContent
+            );
         }
 
         return $svgContent;
