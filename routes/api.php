@@ -31,6 +31,7 @@ Route::get('all-cities', [CityController::class, 'index'])->name('site-cities');
 Route::controller(IconController::class)->group(function () {
     Route::get('allicons/WithoutPagination', 'allWithoutPagination');
     Route::get('/download-icon/{fileName}', 'download');
+    Route::get('/copy-icon/{fileName}', 'getIconCode');
 });
 
 Route::post('userLogin', [AuthController::class, 'userLogin']);
