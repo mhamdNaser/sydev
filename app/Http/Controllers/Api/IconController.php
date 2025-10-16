@@ -63,11 +63,7 @@ class IconController extends Controller
 
         $icon = $this->repo->create($data);
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Icon created successfully',
-            'data' => $icon
-        ], 201);
+        return response()->json(['message' => 'Icon created successfully'], 201);
     }
 
     public function update(StoreIconRequest $request, $id)
