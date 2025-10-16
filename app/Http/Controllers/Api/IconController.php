@@ -58,19 +58,18 @@ class IconController extends Controller
 
     public function getIconCode($fileName)
     {
-        $path = 'icons/' . $fileName;
+        $path = public_path('icons/' . $fileName);
 
         if (!file_exists($path)) {
             return response()->json([
                 'success' => false,
-                'message' => 'File not found.',
+                'message' => 'File not found.'
             ], 404);
         }
 
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
         if ($extension === 'svg') {
-            // قراءة محتوى SVG كنص
             $content = file_get_contents($path);
             return response()->json([
                 'success' => true,
@@ -78,7 +77,6 @@ class IconController extends Controller
                 'code' => $content,
             ]);
         } else {
-            // قراءة صورة ثنائية وتحويلها لـ Base64
             $data = base64_encode(file_get_contents($path));
             $mime = mime_content_type($path);
             $base64String = "data:$mime;base64,$data";
