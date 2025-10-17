@@ -52,7 +52,7 @@ Route::prefix('admin')->group(function () {
 
         Route::controller(IconController::class)->group(function () {
             Route::post('allicons', 'index');
-            Route::get('allicons/WithoutPagination', 'allWithoutPagination');
+            Route::post('allicons/WithoutPagination', 'allWithoutPagination');
             Route::post('icons', 'store');
             Route::put('icons/{id}', 'update');
             Route::delete('icons/{id}', 'destroy');
