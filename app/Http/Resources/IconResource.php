@@ -13,6 +13,7 @@ class IconResource extends JsonResource
             'title' => $this->title,
             'description' => $this->description,
             'category_name' => $this->category ? $this->category->name : null,
+            'category_id' => $this->category_id,
             'is_premium' => $this->is_premium,
             'is_active' => $this->is_active,
             'icon_text' => $this->file_svg ? $this->file_svg : null,
