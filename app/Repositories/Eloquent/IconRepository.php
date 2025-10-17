@@ -31,7 +31,9 @@ class IconRepository implements IconRepositoryInterface
 
         // نحصل على كل البيانات من الكاش أو قاعدة البيانات
         $items = Cache::remember($cacheKey, 60, function () {
-            return Icon::orderBy('id', 'desc')->where("is_active", true)->get();
+            return Icon::where('is_active', true)
+                ->orderBy('id', 'desc')
+                ->get();
         });
 
         // تطبيق الفلترة على الكولكشن
