@@ -12,7 +12,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
 
     use PaginatesCollection;
 
-     public function all($search = null, $rowsPerPage = 10, $page = 1)
+    public function all($search = null, $rowsPerPage = 10, $page = 1)
     {
         $cacheKey = "icon_categories_all";
 
@@ -35,6 +35,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
     public function allWithoutPagination()
     {
         return IconCategories::select('id', 'name')
+            ->where('is_active', true)
             ->orderBy('name', 'asc')
             ->get();
     }
@@ -49,7 +50,7 @@ class IconCategoryRepository implements IconCategoryRepositoryInterface
         Cache::forget('icon_categories_all');
         return IconCategories::create($data);
     }
-    
+
     public function update($id, array $data)
     {
         Cache::forget('icon_categories_all');
