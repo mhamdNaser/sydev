@@ -32,9 +32,11 @@ class IconController extends Controller
         ]);
     }
 
-    public function allWithoutPagination()
+    public function allWithoutPagination(Request $request)
     {
-        $categories = $this->repo->allWithoutPagination();
+        $search = $request->input('search');
+
+        $categories = $this->repo->allWithoutPagination($search);
         return response()->json($categories);
     }
 
