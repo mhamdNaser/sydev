@@ -29,6 +29,7 @@ Route::get('all-countries', [CountryController::class, 'index'])->name('site-cou
 Route::get('all-states', [StateController::class, 'index'])->name('site-states');
 Route::get('all-cities', [CityController::class, 'index'])->name('site-cities');
 Route::post('allicons/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('WithoutPagination');
+Route::post('icon-categories/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('allWithoutPagination');
 
 Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/download-icon/{fileName}', 'download');
