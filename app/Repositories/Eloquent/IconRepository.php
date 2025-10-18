@@ -48,21 +48,29 @@ class IconRepository implements IconRepositoryInterface
         return $this->paginate($items, $rowsPerPage, $page);
     }
 
-    public function allWithoutPagination($search = null)
+    public function allWithoutPagination($search = null, $category = null)
     {
-        $cacheKey = "icon_all_WithoutPagination_" . ($search ?? 'all');
+        // Cache key يشمل الاثنين
+        $cacheKey = "icon_all_WithoutPagination_"
+            . ($category ?? 'allCategories') . "_"
+            . ($search ?? 'allSearch');
 
-        return Cache::remember($cacheKey, 60, function () use ($search) {
+        return Cache::remember($cacheKey, 60, function () use ($search, $category) {
             $query = Icon::query()->with('category');
 
+            // فلترة الكاتيجوري
+            if ($category) {
+                $query->whereHas('category', function ($q) use ($category) {
+                    $q->where('name', $category);
+                });
+            }
+
+            // فلترة البحث على النصوص
             if ($search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('title', 'like', "%{$search}%")
                         ->orWhere('description', 'like', "%{$search}%")
-                        ->orWhere('tags', 'like', "%{$search}%")
-                        ->orWhereHas('category', function ($q2) use ($search) {
-                            $q2->where('name', 'like', "%{$search}%");
-                        });
+                        ->orWhere('tags', 'like', "%{$search}%");
                 });
             }
 

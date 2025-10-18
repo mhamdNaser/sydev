@@ -29,7 +29,7 @@ Route::get('all-countries', [CountryController::class, 'index'])->name('site-cou
 Route::get('all-states', [StateController::class, 'index'])->name('site-states');
 Route::get('all-cities', [CityController::class, 'index'])->name('site-cities');
 Route::post('allicons/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('WithoutPagination');
-Route::get('icon-categories/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('allWithoutPagination');
+Route::get('icon-categories/WithoutPagination', [IconCategoriesController::class, 'allWithoutPagination'])->name('allWithoutPagination');
 
 Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/download-icon/{fileName}', 'download');
@@ -61,7 +61,6 @@ Route::prefix('admin')->group(function () {
 
         Route::controller(IconCategoriesController::class)->group(function () {
             Route::post('icon-categories/all', 'index');
-            Route::get('icon-categories/WithoutPagination', 'allWithoutPagination');
             Route::post('icon-categories', 'store');
             Route::put('icon-categories/{id}', 'update');
             Route::delete('icon-categories/{id}', 'destroy');

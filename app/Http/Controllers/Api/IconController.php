@@ -35,8 +35,9 @@ class IconController extends Controller
     public function allWithoutPagination(Request $request)
     {
         $search = $request->input('search');
+        $category = $request->input('category');
 
-        $categories = $this->repo->allWithoutPagination($search);
+        $categories = $this->repo->allWithoutPagination($search, $category);
         return response()->json($categories);
     }
 
