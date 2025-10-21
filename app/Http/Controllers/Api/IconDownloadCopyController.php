@@ -9,7 +9,19 @@ class IconDownloadCopyController extends Controller
 {
     public function download($fileName)
     {
-        $path = 'icons/' . $fileName;
+        // البحث عن الأيقونة حسب اسم الملف
+        $icon = Icon::where('file_svg', $fileName)
+            ->orWhere('file_png', $fileName)
+            ->first();
+
+        if (!$icon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Icon not found.',
+            ], 404);
+        }
+
+        $path = public_path('icons/' . $fileName);
 
         if (!file_exists($path)) {
             return response()->json([
@@ -18,7 +30,10 @@ class IconDownloadCopyController extends Controller
             ], 404);
         }
 
-        // نرسل الملف مباشرة باسم الملف الأصلي
+        // زيادة عدد التحميلات
+        $icon->increment('download_count');
+
+        // إرسال الملف للتحميل
         return response()->download($path, $fileName, [
             'Content-Type' => mime_content_type($path),
         ]);
