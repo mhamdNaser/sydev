@@ -22,12 +22,6 @@ Route::get('/download-image/{fileName}', [ImageController::class, 'download']);
 Route::get('/locale/{lang}', [LocaleController::class, 'setlocale']);
 Route::get('active-languages', [LanguageController::class, 'active'])->name('active-languages');
 
-Route::get('alladmin', [UserController::class, 'index'])->name('alladmin');
-
-
-Route::get('all-countries', [CountryController::class, 'index'])->name('site-countries');
-Route::get('all-states', [StateController::class, 'index'])->name('site-states');
-Route::get('all-cities', [CityController::class, 'index'])->name('site-cities');
 Route::post('allicons/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('WithoutPagination');
 Route::get('icon-categories/WithoutPagination', [IconCategoriesController::class, 'allWithoutPagination'])->name('allWithoutPagination');
 
