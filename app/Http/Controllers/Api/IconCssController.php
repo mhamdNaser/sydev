@@ -23,7 +23,7 @@ class IconCssController extends Controller
                 $svgContent = file_get_contents($svgPath);
                 $svgDataUri = 'data:image/svg+xml;base64,' . base64_encode($svgContent);
 
-                $css .= ".sydev-{$icon->name} {
+                $css .= ".sydev-{$icon->title} {
                     background: url('{$svgDataUri}') no-repeat center;
                     background-size: contain;
                     display: inline-block;
