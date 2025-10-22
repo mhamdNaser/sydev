@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\IconFiles;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 
@@ -16,7 +17,7 @@ class IconCssController extends Controller
             $css = "";
 
             foreach ($icons as $icon) {
-                $svgPath = public_path($icon->url);
+                $svgPath = optional(IconFiles::where('icon_id', $icon->id)->where('file_type', 'svg')->first())->file_path;
                 if (!file_exists($svgPath)) continue;
 
                 $svgContent = file_get_contents($svgPath);
