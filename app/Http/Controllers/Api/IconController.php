@@ -37,8 +37,8 @@ class IconController extends Controller
         $search = $request->input('search');
         $category = $request->input('category');
 
-        $categories = $this->repo->allWithoutPagination($search, $category);
-        return response()->json($categories);
+        $Icons = $this->repo->allWithoutPagination($search, $category);
+        return response()->json(IconResource::collection($Icons));
     }
 
     public function store(StoreIconRequest $request)

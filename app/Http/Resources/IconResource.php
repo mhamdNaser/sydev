@@ -16,7 +16,9 @@ class IconResource extends JsonResource
             'category_id' => $this->category_id,
             'is_premium' => $this->is_premium,
             'is_active' => $this->is_active,
-            'icon_text' => $this->svgFile ? $this->svgFile : null,
+            'icon_text' => optional($this->files->where('file_type', 'svg')->first())->file_path,
+            'file_png' => optional($this->files->where('file_type', 'png')->first())->file_path,
+            'file_svg' => optional($this->files->where('file_type', 'svg')->first())->file_path,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -33,6 +33,7 @@ Route::get('icon-categories/WithoutPagination', [IconCategoriesController::class
 
 Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/download-icon/{fileName}', 'download');
+    Route::get('/download-count/{fileName}', 'downloadCount');
     Route::get('/get-icon-svg/{fileName}', 'getIconCode');
     Route::get('/get-icon-jsx/{fileName}', 'getIconCodeJsx');
 });

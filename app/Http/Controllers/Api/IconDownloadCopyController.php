@@ -3,23 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Icon;
 use Illuminate\Http\Request;
 
 class IconDownloadCopyController extends Controller
 {
     public function download($fileName)
     {
-        // البحث عن الأيقونة حسب اسم الملف
-        $icon = Icon::where('file_svg', $fileName)
-            ->orWhere('file_png', $fileName)
-            ->first();
-
-        if (!$icon) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Icon not found.',
-            ], 404);
-        }
 
         $path = public_path('icons/' . $fileName);
 
@@ -30,12 +20,33 @@ class IconDownloadCopyController extends Controller
             ], 404);
         }
 
-        // زيادة عدد التحميلات
-        $icon->increment('download_count');
-
         // إرسال الملف للتحميل
         return response()->download($path, $fileName, [
             'Content-Type' => mime_content_type($path),
+        ]);
+    }
+
+    public function downloadCount($fileName)
+    {
+        $path = 'icons/' . $fileName;
+        $icon = Icon::where('file_svg', $path)
+            ->orWhere('file_png', $path)
+            ->first();
+
+        if (!$icon) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Icon not found.'
+            ], 404);
+        }
+
+        $icon->download_count += 1;
+        $icon->save();
+
+        return response()->json([
+            'success' => true,
+            'download_count' => $icon->download_count,
+            'file_path' => $path,
         ]);
     }
 

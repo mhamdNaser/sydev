@@ -38,25 +38,8 @@ class Icon extends Model
         return $this->belongsTo(User::class, 'user_id');
     }
 
-
-     public function files()
+    public function files()
     {
-        return $this->hasMany(IconFile::class);
-    }
-
-    /**
-     * الحصول على ملف SVG فقط
-     */
-    public function svgFile()
-    {
-        return $this->hasOne(IconFile::class)->where('file_type', 'svg');
-    }
-
-    /**
-     * الحصول على ملف PNG فقط
-     */
-    public function pngFile()
-    {
-        return $this->hasOne(IconFile::class)->where('file_type', 'png');
+        return $this->hasMany(IconFiles::class, 'icon_id');
     }
 }

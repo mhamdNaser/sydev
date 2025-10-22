@@ -9,6 +9,7 @@ use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Encoders\PngEncoder;
 use Illuminate\Support\Str;
 use App\Models\Icon;
+use App\Models\IconFiles;
 use App\Traits\ManageFiles;
 use App\Traits\PaginatesCollection;
 use Illuminate\Support\Facades\Cache;
@@ -87,25 +88,66 @@ class IconRepository implements IconRepositoryInterface
     {
         $slug = Str::slug($data['title']);
         $storagePath = public_path('icons');
-        if (!file_exists($storagePath)) mkdir($storagePath, 0755, true);
+        if (!file_exists($storagePath)) {
+            mkdir($storagePath, 0755, true);
+        }
+
+        // إنشاء الأيقونة
+        $icon = $this->model->create([
+            'title' => $data['title'],
+            'description' => $data['description'] ?? null,
+            'category_id' => $data['category_id'] ?? null,
+            'user_id' => $data['user_id'] ?? null,
+            'is_premium' => $data['is_premium'] ?? false,
+            'is_active' => $data['is_active'] ?? true,
+            'tags' => $data['tags'] ?? [],
+        ]);
 
         // حفظ SVG كنص
         $svgPath = $this->uploadFile($data['icon_text'], 'icons', $slug, 'svg');
 
+        // 🔸 حساب الحجم من الملف الفعلي
+        $svgFullPath = public_path($svgPath);
+        $svgSize = file_exists($svgFullPath) ? filesize($svgFullPath) : 0;
+
+        // 🔸 SVG غالباً ما فيها width/height فعلي، نتركها null
+        IconFiles::create([
+            'icon_id' => $icon->id,
+            'file_name' => $slug . '.svg',
+            'file_path' => $svgPath,
+            'file_type' => 'svg',
+            'file_size' => $svgSize,
+            'dimensions' => null,
+        ]);
+
         // تحويل SVG إلى PNG
         $driver = extension_loaded('imagick') ? new ImagickDriver() : new GdDriver();
         $manager = new ImageManager($driver);
-        $image = $manager->read($data['icon_text']); // قراءة الـ SVG
+        $image = $manager->read($data['icon_text']);
         $encoded = $image->encode(new PngEncoder());
         $pngPath = $this->uploadFile($encoded, 'icons', $slug, 'png');
 
-        $data['file_svg'] = $svgPath;
-        $data['file_png'] = $pngPath;
+        // 🔸 حساب الحجم والأبعاد من الملف الفعلي
+        $pngFullPath = public_path($pngPath);
+        $pngSize = file_exists($pngFullPath) ? filesize($pngFullPath) : 0;
+        $pngDimensions = null;
+        if (file_exists($pngFullPath)) {
+            $info = getimagesize($pngFullPath);
+            $pngDimensions = $info ? "{$info[0]}x{$info[1]}" : null;
+        }
 
-        unset($data['icon_text']);
+        IconFiles::create([
+            'icon_id' => $icon->id,
+            'file_name' => $slug . '.png',
+            'file_path' => $pngPath,
+            'file_type' => 'png',
+            'file_size' => $pngSize,
+            'dimensions' => $pngDimensions,
+        ]);
 
         Cache::forget('icon_all');
-        return $this->model->create($data);
+
+        return $icon->load('files');
     }
 
     public function update(int $id, array $data)

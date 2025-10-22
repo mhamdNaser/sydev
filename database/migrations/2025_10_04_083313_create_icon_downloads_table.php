@@ -18,9 +18,6 @@ return new class extends Migration
             $table->foreignId('icon_file_id')->constrained()->onDelete('cascade');
             $table->enum('download_type', ['svg', 'png']);
             $table->string('ip_address', 45)->nullable();
-            $table->text('user_agent')->nullable();
-            $table->string('country', 100)->nullable();
-            $table->string('city', 100)->nullable();
             $table->timestamp('downloaded_at')->useCurrent();
 
             $table->index('user_id');
