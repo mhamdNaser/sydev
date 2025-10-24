@@ -7,23 +7,26 @@ use App\Models\AdminRole;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
+use App\Traits\PaginatesCollection;
+use Spatie\Permission\Models\Role;
 
 class AdminRoleRepository implements AdminRoleRepositoryInterface
 {
+    use PaginatesCollection;
     public function getAllRoles($search = null, $rowsPerPage = 10, $page = 1)
     {
-        $cacheKey = "roles_{$search}_{$rowsPerPage}_{$page}";
+        $cacheKey = "all_roles";
 
-        return Cache::remember($cacheKey, 60, function () use ($search, $rowsPerPage) {
-            $query = AdminRole::query();
-
-            if ($search) {
-                $query->where('name', 'LIKE', "%$search%");
-            }
-
-            // استثناء دور السوبر أدمن مثلاً
-            return $query->where('name', '!=', 'super-admin')->paginate($rowsPerPage);
+        $items = Cache::remember($cacheKey, 60, function () {
+            return Role::orderBy('id', 'desc')->with('permissions')->get();
         });
+
+        if ($search) {
+            $items = $items->filter(function ($item) use ($search) {
+                return stripos($item->name, $search) !== false;
+            });
+        }
+        return $this->paginate($items, $rowsPerPage, $page);
     }
 
     public function allRoles()

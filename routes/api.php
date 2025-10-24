@@ -90,12 +90,13 @@ Route::prefix('admin')->group(function () {
         });
 
         Route::controller(AdminRoleController::class)->middleware('auth:sanctum')->group(function () {
-            Route::get('/roles', 'index');       // get all roles (with pagination)
-            Route::post('/roles', 'store');       // create role
-            Route::get('/roles/{id}', 'show');    // show one role
-            Route::put('/roles/{id}', 'update');  // update role
-            Route::delete('/roles/{id}',  'destroy'); // delete role
-            Route::patch('/roles/{id}/status', 'changeStatus'); // toggle status
+            Route::get('/roles', 'index');
+            Route::post('/roles', 'store');
+            Route::get('/roles/{id}', 'show');
+            Route::put('/roles/{id}', 'update');
+            Route::delete('/roles/{id}',  'destroy');
+            Route::patch('/roles/{id}/status', 'changeStatus');
+            Route::post('show-role-permissions/{id}', 'permission')->name('show-role-permissions');
         });
 
 
