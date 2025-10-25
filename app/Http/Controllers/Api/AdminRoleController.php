@@ -3,9 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PermissionsRoles\StoreRoleRequest;
+use App\Http\Resources\RoleResource;
 use App\Repositories\Eloquent\AdminRoleRepository;
 use Illuminate\Http\Request;
-use App\Models\AdminRole;
 
 class AdminRoleController extends Controller
 {
@@ -18,8 +19,17 @@ class AdminRoleController extends Controller
 
     public function index(Request $request)
     {
-        $roles = $this->roles->getAllRoles($request->search);
-        return response()->json($roles);
+        $search = $request->input('search');
+        $rowsPerPage = $request->input('rowsPerPage', 10);
+        $page = $request->input('page', 1);
+
+        $result = $this->roles->getAllRoles($search, $rowsPerPage, $page);
+
+        return response()->json([
+            'data' => RoleResource::collection($result['data']),
+            'meta' => $result['meta'],
+            'links' => $result['links'],
+        ]);
     }
 
     public function store(Request $request)
@@ -33,22 +43,13 @@ class AdminRoleController extends Controller
         return response()->json($role);
     }
 
-    public function show($id)
+    public function update(StoreRoleRequest $request, $id)
     {
-        return response()->json(AdminRole::findOrFail($id));
-    }
+        $data = $request->validated();
 
-    public function permission($id)
-    {
-        $permissions = $this->roles->getRolePermissions($id);
-        return response()->json($permissions);
-    }
+        $this->roles->updateRole($id, $data);
 
-    public function update(Request $request, $id)
-    {
-        $data = $request->only(['name', 'permissions']);
-        $role = $this->roles->updateRole($id, $data);
-        return response()->json($role);
+        return response()->json(['message' => 'Role updated successfully.'], 201);
     }
 
     public function deleteRoleArray(Request $request)

@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\LocaleController;
 use App\Http\Controllers\Api\StateController;
 use App\Http\Controllers\Api\IconDownloadCopyController;
+use App\Http\Controllers\Api\PermissionsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -62,6 +63,22 @@ Route::prefix('admin')->group(function () {
             Route::patch('icon-categories/{id}/status', 'changeStatus');
         });
 
+        Route::controller(AdminRoleController::class)->middleware('auth:sanctum')->group(function () {
+            Route::post('/allroles', 'index');
+            Route::post('/roles', 'store');
+            Route::put('/roles/{id}', 'update');
+            Route::delete('/roles/{id}',  'destroy');
+        });
+
+        Route::controller(PermissionsController::class)->group(function () {
+            Route::post('all-permissions', 'index')->name('permissions');
+            Route::get('all-permissions', 'allPermissions')->name('all-permissions');
+            Route::post('permissions', 'store')->name('store-permission');
+            Route::put('permissions/{id}', 'update')->name('update-permission');
+            Route::post('update-role-permissions/{role}', 'updateRolePermissions')->name('update-role-permissions');
+            Route::delete('permissions/{id}', 'destroy')->name('delete-permission');
+        });
+
         Route::controller(CountryController::class)->group(function () {
             Route::get('all-countries', 'index')->name('all-countries');
             Route::post('countries', 'allCountry')->name('countries');
@@ -89,15 +106,6 @@ Route::prefix('admin')->group(function () {
             Route::post('delete-cities', 'destroyarray')->name('delete-cities');
         });
 
-        Route::controller(AdminRoleController::class)->middleware('auth:sanctum')->group(function () {
-            Route::get('/roles', 'index');
-            Route::post('/roles', 'store');
-            Route::get('/roles/{id}', 'show');
-            Route::put('/roles/{id}', 'update');
-            Route::delete('/roles/{id}',  'destroy');
-            Route::patch('/roles/{id}/status', 'changeStatus');
-            Route::post('show-role-permissions/{id}', 'permission')->name('show-role-permissions');
-        });
 
 
 

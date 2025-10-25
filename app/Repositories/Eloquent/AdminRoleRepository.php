@@ -13,6 +13,7 @@ use Spatie\Permission\Models\Role;
 class AdminRoleRepository implements AdminRoleRepositoryInterface
 {
     use PaginatesCollection;
+
     public function getAllRoles($search = null, $rowsPerPage = 10, $page = 1)
     {
         $cacheKey = "all_roles";
@@ -31,52 +32,29 @@ class AdminRoleRepository implements AdminRoleRepositoryInterface
 
     public function allRoles()
     {
-        return AdminRole::where('name', '!=', 'super-admin')->get();
+        return Role::where('name', '!=', 'super-admin')->get();
     }
 
     public function createRole(array $data)
     {
-        $role = AdminRole::create(['name' => $data['name'], 'guard_name' => $data['guard_name'] ?? 'web']);
+        Cache::forget('all_roles');
+
+        $role = Role::create(['name' => $data['name'], 'guard_name' => $data['guard_name'] ?? 'web']);
 
         if (isset($data['permissions'])) {
             $role->syncPermissions($data['permissions']);
         }
-
-        Cache::flush();
         return $role;
     }
 
-    public function getRolePermissions($roleId)
-    {
-        $role = AdminRole::findOrFail($roleId);
-        return $role->permissions;
-    }
-
-    public function updateRolePermissions($roleId, array $permissionsData)
-    {
-        $role = AdminRole::findOrFail($roleId);
-        $role->syncPermissions($permissionsData);
-
-        Cache::flush();
-        return $role->permissions;
-    }
 
     public function updateRole($roleId, array $data)
     {
-        $role = AdminRole::findOrFail($roleId);
+        Cache::forget('all_roles');
 
-        if (isset($data['name'])) {
-            $role->name = $data['name'];
-        }
+        $role = Role::find($roleId);
 
-        if (isset($data['permissions'])) {
-            $role->syncPermissions($data['permissions']);
-        }
-
-        $role->save();
-
-        Cache::flush();
-        return $role;
+        $role->update($data);
     }
 
     public function softDeleteRoles(array $roleIds)
@@ -87,8 +65,17 @@ class AdminRoleRepository implements AdminRoleRepositoryInterface
 
     public function deleteRole($roleId)
     {
-        $role = AdminRole::findOrFail($roleId);
+        $role = Role::findOrFail($roleId);
         $role->delete();
         Cache::flush();
+    }
+
+
+    public function updateRolePermissions($roleId, array $permissions)
+    {
+        $role = Role::findOrFail($roleId);
+        $role->syncPermissions($permissions);
+        Cache::flush();
+        return $role;
     }
 }

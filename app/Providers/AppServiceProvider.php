@@ -13,6 +13,8 @@ use App\Repositories\Interfaces\AdminRoleRepositoryInterface;
 use App\Repositories\Interfaces\IconRepositoryInterface;
 use App\Repositories\Interfaces\IconCategoryRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
+use App\Repositories\Interfaces\PermissionsRepositoryInterface;
+use App\Repositories\Eloquent\PermissionsRepository;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -26,6 +28,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(AdminRoleRepositoryInterface::class, AdminRoleRepository::class);
         $this->app->bind(IconRepositoryInterface::class,IconRepository::class);
         $this->app->bind(IconCategoryRepositoryInterface::class, IconCategoryRepository::class);
+        $this->app->bind(PermissionsRepositoryInterface::class, PermissionsRepository::class);
     }
 
     /**
