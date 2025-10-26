@@ -27,7 +27,7 @@ class UserController extends Controller
         $result = $this->users->getAllUsers($search, $rowsPerPage, $page);
 
         return response()->json([
-            'data' => $result['data'],
+            'data' => UserResource::collection($result['data']),
             'meta' => $result['meta'],
             'links' => $result['links'],
         ]);
