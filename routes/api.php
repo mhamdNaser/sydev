@@ -44,7 +44,7 @@ Route::prefix('admin')->group(function () {
         Route::post('adminLogin', 'adminLogin')->name('adminLogin');
     });
 
-    Route::middleware('auth:sanctum')->group(function () {
+    Route::middleware(['auth:sanctum', 'role:admin'])->group(function () {
         Route::post('logout', [AuthController::class, 'logout']);
 
         Route::controller(IconController::class)->group(function () {
@@ -63,7 +63,7 @@ Route::prefix('admin')->group(function () {
             Route::patch('icon-categories/{id}/status', 'changeStatus');
         });
 
-        Route::controller(AdminRoleController::class)->middleware('auth:sanctum')->group(function () {
+        Route::controller(AdminRoleController::class)->group(function () {
             Route::post('/allroles', 'index');
             Route::post('/roles', 'store');
             Route::put('/roles/{id}', 'update');
@@ -77,6 +77,14 @@ Route::prefix('admin')->group(function () {
             Route::put('permissions/{id}', 'update')->name('update-permission');
             Route::post('update-role-permissions/{role}', 'updateRolePermissions')->name('update-role-permissions');
             Route::delete('permissions/{id}', 'destroy')->name('delete-permission');
+        });
+
+        Route::controller(UserController::class)->group(function () {
+            Route::post('all-users', 'index')->name('users');
+            Route::get('all-users', 'allPermissions')->name('all-users');
+            Route::post('users', 'store')->name('store-user');
+            Route::put('users/{id}', 'update')->name('update-user');
+            Route::delete('users/{id}', 'destroy')->name('delete-user');
         });
 
         Route::controller(CountryController::class)->group(function () {

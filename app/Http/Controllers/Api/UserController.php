@@ -10,13 +10,27 @@ use Illuminate\Http\Request;
 class UserController extends Controller
 {
 
-    public function __construct(private UserRepositoryInterface $users) {}
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    protected $users;
+
+    public function __construct(UserRepositoryInterface $users)
     {
-        return response()->json(UserResource::collection($this->users->all()));
+        $this->users = $users;
+    }
+
+
+    public function index(Request $request)
+    {
+        $search = $request->input('search');
+        $rowsPerPage = $request->input('rowsPerPage', 10);
+        $page = $request->input('page', 1);
+
+        $result = $this->users->getAllUsers($search, $rowsPerPage, $page);
+
+        return response()->json([
+            'data' => $result['data'],
+            'meta' => $result['meta'],
+            'links' => $result['links'],
+        ]);
     }
 
     /**

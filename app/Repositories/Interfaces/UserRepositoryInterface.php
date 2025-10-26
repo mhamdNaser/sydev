@@ -6,6 +6,7 @@ use App\Models\User;
 
 interface UserRepositoryInterface
 {
+    public function getAllUsers($search = null, $rowsPerPage = 10, $page = 1);
     public function all();
     public function find($id): ?User;
     public function create(array $data): User;

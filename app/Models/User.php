@@ -22,19 +22,8 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
-        'password',
-        'role'
+        'password'
     ];
-
-    public function scopeAdmin($query)
-    {
-        return $query->where('role', 'admin');
-    }
-
-    public function scopeUser($query)
-    {
-        return $query->where('role', 'user');
-    }
 
     /**
      * The attributes that should be hidden for serialization.

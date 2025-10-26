@@ -4,10 +4,30 @@ namespace App\Repositories\Eloquent;
 
 use App\Models\User;
 use App\Repositories\Interfaces\UserRepositoryInterface;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
+use App\Traits\PaginatesCollection;
 
 class UserRepository implements UserRepositoryInterface
 {
+    use PaginatesCollection;
+
+    public function getAllUsers($search = null, $rowsPerPage = 10, $page = 1)
+    {
+        $cacheKey = "all_Users";
+
+        $items = Cache::remember($cacheKey, 60, function () {
+            return User::orderBy('id', 'desc')->get();
+        });
+
+        if ($search) {
+            $items = $items->filter(function ($item) use ($search) {
+                return stripos($item->name, $search) !== false;
+            });
+        }
+        return $this->paginate($items, $rowsPerPage, $page);
+    }
+
     public function all()
     {
         return User::latest()->get();
