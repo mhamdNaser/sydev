@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\PermissionsRoles\StoreRequest;
 use App\Repositories\Eloquent\PermissionsRepository;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
@@ -43,19 +44,20 @@ class PermissionsController extends Controller
         // Create a new permission
         $data = $request->validate([
             'name' => 'required|string|unique:permissions,name',
-            'description' => 'nullable|string',
         ]);
 
         $permission = $this->permissions->create($data);
         return response()->json($permission);
     }
 
-    public function update(Request $request, $id)
+    public function update(StoreRequest $request, $id)
     {
         // Update an existing permission
-        $data = $request->only(['name', 'description']);
+        $data = $request->validated();
+
         $permission = $this->permissions->update($id, $data);
-        return response()->json($permission);
+        
+        return response()->json(['message' => 'permission updated successfully.'], 201);
     }
 
     public function updateRolePermissions(Request $request, $roleId)

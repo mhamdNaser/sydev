@@ -35,32 +35,20 @@ class PermissionsRepository implements PermissionsRepositoryInterface
 
     public function create(array $data)
     {
-        return Permission::create($data);
+        Cache::forget('all_permissions');
 
-        if (isset($data['permissions'])) {
-            $role->syncPermissions($data['permissions']);
-        }
+        $permission = Permission::create(['name' => $data['name'], 'guard_name' => $data['guard_name'] ?? 'web']);
 
-        Cache::flush();
-        return $role;
+        return $permission;
     }
 
     public function update($permissionId, array $data)
     {
-        $permission = Permission::findOrFail($permissionId);
+        Cache::forget('all_permissions');
 
-        if (isset($data['name'])) {
-            $permission->name = $data['name'];
-        }
+        $permission = Permission::find($permissionId);
 
-        if (isset($data['permissions'])) {
-            $permission->syncPermissions($data['permissions']);
-        }
-
-        $permission->save();
-
-        Cache::flush();
-        return $permission;
+        $permission->update($data);
     }
 
     public function updateRolePermissions($roleId, array $permissionIds)
@@ -75,12 +63,14 @@ class PermissionsRepository implements PermissionsRepositoryInterface
 
     public function softDeletePermissions(array $permissionIds)
     {
+        Cache::forget('all_permissions');
         DB::table('permissions')->whereIn('id', $permissionIds)->delete();
         Cache::flush();
     }
 
     public function delete($permissionId)
     {
+        Cache::forget('all_permissions');
         $permission = Permission::findOrFail($permissionId);
         $permission->delete();
         Cache::flush();

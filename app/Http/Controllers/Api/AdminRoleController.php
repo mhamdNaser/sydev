@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Admin\PermissionsRoles\StoreRoleRequest;
+use App\Http\Requests\Admin\PermissionsRoles\StoreRequest;
 use App\Http\Resources\RoleResource;
 use App\Repositories\Eloquent\AdminRoleRepository;
 use Illuminate\Http\Request;
@@ -43,7 +43,7 @@ class AdminRoleController extends Controller
         return response()->json($role);
     }
 
-    public function update(StoreRoleRequest $request, $id)
+    public function update(StoreRequest $request, $id)
     {
         $data = $request->validated();
 
