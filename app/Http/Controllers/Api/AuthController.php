@@ -67,12 +67,19 @@ class AuthController extends Controller
 
         $user = User::where('email', $credentials['email'])->first();
 
+        // فحص وجود المستخدم وصحة كلمة المرور
         if (!$user || !Hash::check($credentials['password'], $user->password)) {
             return response()->json(['message' => 'Invalid credentials'], 401);
         }
 
+        // فحص إذا عنده role "admin"
+        if (!$user->hasRole('admin')) {
+            return response()->json(['message' => 'You are not authorized as admin'], 403);
+        }
+
+        // حذف أي توكنات قديمة وإنشاء توكن جديد
         $user->tokens()->delete();
-        $token = $user->createToken('admin_token')->plainTextToken;
+        $token = $user->createToken('admin_token', ['role:admin'])->plainTextToken;
 
         return response()->json([
             'message' => 'Admin login successful',
