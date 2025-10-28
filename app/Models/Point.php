@@ -1,0 +1,20 @@
+<?
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Point extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'frame_id', 'point_id', 'x', 'y', 'state', 'pressure'
+    ];
+
+    public function frame()
+    {
+        return $this->belongsTo(Frame::class);
+    }
+}
