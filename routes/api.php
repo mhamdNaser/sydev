@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\AdminRoleController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CityController;
 use App\Http\Controllers\Api\CountryController;
+use App\Http\Controllers\Api\GestureController;
 use App\Http\Controllers\Api\IconController;
 use App\Http\Controllers\Api\IconCategoriesController;
 use App\Http\Controllers\Api\ImageController;
@@ -33,6 +34,7 @@ Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/get-icon-jsx/{fileName}', 'getIconCodeJsx');
 });
 
+Route::post('gestures', [GestureController::class, 'store']);
 Route::post('userLogin', [AuthController::class, 'userLogin']);
 
 Route::prefix('admin')->group(function () {
