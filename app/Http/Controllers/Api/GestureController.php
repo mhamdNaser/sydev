@@ -9,6 +9,26 @@ use Illuminate\Support\Facades\DB;
 
 class GestureController extends Controller
 {
+     public function index()
+    {
+        try {
+            // جلب جميع الجستشر مع الفريمات والنقاط التابعة لهم
+            $gestures = Gesture::with(['frames.points'])->get();
+
+            // إرجاع النتيجة بصيغة JSON منظمة
+            return response()->json([
+                'count' => $gestures->count(),
+                'data' => $gestures,
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to fetch gestures',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+    
     public function store(Request $request)
     {
         $request->validate([
@@ -96,65 +116,3 @@ class GestureController extends Controller
         }
     }
 }
-
-
-// namespace App\Http\Controllers\Api;
-
-// use App\Http\Controllers\Controller;
-// use App\Models\Gesture;
-// use Illuminate\Http\Request;
-// use Illuminate\Support\Facades\DB;
-
-// class GestureController extends Controller
-// {
-//    public function store(Request $request)
-//     {
-//         $request->validate([
-//             'character' => 'required|string|max:255',
-//             'start_time' => 'required|integer',
-//             'end_time' => 'required|integer',
-//             'duration_ms' => 'required|integer',
-//             'frame_count' => 'required|integer',
-//             'frames' => 'required|array|min:1',
-//         ]);
-
-//         DB::beginTransaction();
-//         try {
-//             $gesture = Gesture::create([
-//                 'character' => $request->character,
-//                 'user_id' => $request->user_id ?? null,
-//                 'device_id' => $request->device_id ?? null,
-//                 'start_time' => date('Y-m-d H:i:s', $request->start_time / 1000),
-//                 'end_time' => date('Y-m-d H:i:s', $request->end_time / 1000),
-//                 'duration_ms' => $request->duration_ms,
-//                 'frame_count' => $request->frame_count,
-//                 'notes' => $request->notes ?? null,
-//             ]);
-
-//             foreach ($request->frames as $frameData) {
-//                 $frame = $gesture->frames()->create([
-//                     'frame_id' => $frameData['frame_id'],
-//                     'timestamp' => $frameData['ts'],
-//                     'points_count' => count($frameData['points']),
-//                     'raw_payload' => $frameData,
-//                 ]);
-
-//                 foreach ($frameData['points'] as $pt) {
-//                     $frame->points()->create([
-//                         'point_id' => $pt['id'],
-//                         'x' => $pt['x'],
-//                         'y' => $pt['y'],
-//                         'state' => $pt['state'],
-//                         'pressure' => $pt['pressure'] ?? null,
-//                     ]);
-//                 }
-//             }
-
-//             DB::commit();
-//             return response()->json(['message' => 'Gesture saved successfully', 'gesture_id' => $gesture->id], 201);
-//         } catch (\Exception $e) {
-//             DB::rollBack();
-//             return response()->json(['error' => $e->getMessage()], 500);
-//         }
-//     }
-// }
