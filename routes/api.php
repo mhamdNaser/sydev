@@ -26,6 +26,7 @@ Route::get('active-languages', [LanguageController::class, 'active'])->name('act
 
 Route::post('allicons/WithoutPagination', [IconController::class, 'allWithoutPagination'])->name('WithoutPagination');
 Route::get('icon-categories/WithoutPagination', [IconCategoriesController::class, 'allWithoutPagination'])->name('allWithoutPagination');
+Route::post('userLogin', [AuthController::class, 'userLogin']);
 
 Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/download-icon/{fileName}', 'download');
@@ -34,8 +35,12 @@ Route::controller(IconDownloadCopyController::class)->group(function () {
     Route::get('/get-icon-jsx/{fileName}', 'getIconCodeJsx');
 });
 
-Route::post('gestures', [GestureController::class, 'store']);
-Route::post('userLogin', [AuthController::class, 'userLogin']);
+Route::controller(GestureController::class)->group(function () {
+    Route::post('gestures', 'store');
+    Route::get('gestures', 'index');
+    Route::get('/gestures/count/{character}', 'countByCharacter');
+});
+
 
 Route::prefix('admin')->group(function () {
 

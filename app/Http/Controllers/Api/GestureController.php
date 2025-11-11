@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class GestureController extends Controller
 {
-     public function index()
+    public function index()
     {
         try {
             // جلب جميع الجستشر مع الفريمات والنقاط التابعة لهم
@@ -20,7 +20,6 @@ class GestureController extends Controller
                 'count' => $gestures->count(),
                 'data' => $gestures,
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to fetch gestures',
@@ -28,7 +27,25 @@ class GestureController extends Controller
             ], 500);
         }
     }
-    
+
+    public function countByCharacter($character)
+    {
+        try {
+            // عدّ جميع الإشارات التي تحمل نفس اسم الحرف
+            $count = Gesture::where('character', $character)->count();
+
+            return response()->json([
+                'character' => $character,
+                'count' => $count
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to count gestures',
+                'details' => $e->getMessage(),
+            ], 500);
+        }
+    }
+
     public function store(Request $request)
     {
         $request->validate([
@@ -107,7 +124,6 @@ class GestureController extends Controller
                 'message' => 'Gesture saved successfully',
                 'gesture_id' => $gesture->id
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
