@@ -22,6 +22,7 @@ class GestureController extends Controller
 
         DB::beginTransaction();
         try {
+            // إنشاء gesture
             $gesture = Gesture::create([
                 'character' => $request->character,
                 'user_id' => $request->user_id ?? null,
@@ -41,17 +42,34 @@ class GestureController extends Controller
                     'raw_payload' => $frameData,
                 ]);
 
+                $windowSize = 3; // عدد النقاط لتنعيم الضغط
+                $pointBuffer = [];
+
                 foreach ($frameData['points'] as $index => $pt) {
-                    // حساب الضغط تقريبياً
-                    $pressure = 0.0;
-                    if (isset($frameData['points'][$index - 1])) {
-                        $prev = $frameData['points'][$index - 1];
-                        $dx = $pt['x'] - $prev['x'];
-                        $dy = $pt['y'] - $prev['y'];
-                        $distance = sqrt($dx * $dx + $dy * $dy);
-                        $pressure = max(0.0, 1.0 - $distance); // كلما المسافة أصغر → ضغط أعلى
-                    } else {
-                        $pressure = 1.0; // أول نقطة في الإطار
+                    // إضافة النقطة للمصفوفة المؤقتة
+                    $pointBuffer[] = $pt;
+                    if (count($pointBuffer) > $windowSize) {
+                        array_shift($pointBuffer); // إزالة النقطة الأقدم
+                    }
+
+                    $pressure = 1.0; // افتراضي للنقطة الأولى
+                    if (count($pointBuffer) > 1) {
+                        $sumSpeed = 0.0;
+                        for ($i = 1; $i < count($pointBuffer); $i++) {
+                            $prev = $pointBuffer[$i - 1];
+                            $curr = $pointBuffer[$i];
+
+                            $dx = $curr['x'] - $prev['x'];
+                            $dy = $curr['y'] - $prev['y'];
+                            $distance = sqrt($dx * $dx + $dy * $dy);
+
+                            $dt = max(1, ($curr['ts'] ?? $frameData['ts']) - ($prev['ts'] ?? $frameData['ts']));
+                            $speed = $distance / $dt;
+                            $sumSpeed += $speed;
+                        }
+
+                        $avgSpeed = $sumSpeed / (count($pointBuffer) - 1);
+                        $pressure = max(0.1, min(1.0, 1.0 - $avgSpeed * 5)); // تعديل عامل الحساسية حسب الحاجة
                     }
 
                     $frame->points()->create([
@@ -65,10 +83,16 @@ class GestureController extends Controller
             }
 
             DB::commit();
-            return response()->json(['message' => 'Gesture saved successfully', 'gesture_id' => $gesture->id], 201);
+            return response()->json([
+                'message' => 'Gesture saved successfully',
+                'gesture_id' => $gesture->id
+            ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
         }
     }
 }
