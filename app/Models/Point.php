@@ -10,7 +10,17 @@ class Point extends Model
     use HasFactory;
 
     protected $fillable = [
-        'frame_id', 'point_id', 'x', 'y', 'state', 'pressure'
+        'frame_id',
+        'point_id',
+        'x',
+        'y',
+        'dx',
+        'dy',
+        'vx',
+        'vy',
+        'angle',
+        'state',
+        'pressure',
     ];
 
     public function frame()

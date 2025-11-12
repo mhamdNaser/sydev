@@ -11,11 +11,7 @@ class Frame extends Model
 
     protected $fillable = [
         'gesture_id', 'frame_id', 'timestamp',
-        'points_count', 'raw_payload'
-    ];
-
-    protected $casts = [
-        'raw_payload' => 'array'
+        'points_count', 'delta_ms',
     ];
 
     public function gesture()
