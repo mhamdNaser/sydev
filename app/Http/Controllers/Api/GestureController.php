@@ -12,13 +12,47 @@ class GestureController extends Controller
     public function index()
     {
         try {
-            // جلب جميع الجستشر مع الفريمات والنقاط التابعة لهم
+            // نجلب الإيماءات مع الفريمات والنقاط المرتبطة بكل فريم
             $gestures = Gesture::with(['frames.points'])->get();
 
-            // إرجاع النتيجة بصيغة JSON منظمة
+            $formattedGestures = $gestures->map(function ($gesture) {
+                $points = collect();
+
+                foreach ($gesture->frames as $frame) {
+                    foreach ($frame->points as $pt) {
+                        $points->push([
+                            'x' => $pt->x,
+                            'y' => $pt->y,
+                            'dx' => $pt->dx,
+                            'dy' => $pt->dy,
+                            'vx' => $pt->vx,
+                            'vy' => $pt->vy,
+                            'angle' => $pt->angle,
+                            'pressure' => $pt->pressure,
+                            'state' => $pt->state,
+                            'timestamp' => $frame->timestamp,
+                            'delta_ms' => $frame->delta_ms,
+                            'frame_id' => $frame->frame_id,
+                        ]);
+                    }
+                }
+
+                // ترتيب النقاط حسب الزمن
+                $points = $points->sortBy('timestamp')->values();
+
+                return [
+                    'id' => $gesture->id,
+                    'character' => $gesture->character,
+                    'duration_ms' => $gesture->duration_ms,
+                    'frame_count' => $gesture->frame_count,
+                    'points_count' => $points->count(),
+                    'points' => $points,
+                ];
+            });
+
             return response()->json([
-                'count' => $gestures->count(),
-                'data' => $gestures,
+                'count' => $formattedGestures->count(),
+                'data' => $formattedGestures,
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
@@ -28,23 +62,6 @@ class GestureController extends Controller
         }
     }
 
-    public function countByCharacter($character)
-    {
-        try {
-            // عدّ جميع الإشارات التي تحمل نفس اسم الحرف
-            $count = Gesture::where('character', $character)->count();
-
-            return response()->json([
-                'character' => $character,
-                'count' => $count
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => 'Failed to count gestures',
-                'details' => $e->getMessage(),
-            ], 500);
-        }
-    }
 
     public function store(Request $request)
     {
@@ -77,7 +94,7 @@ class GestureController extends Controller
                     'frame_id' => $frameData['frame_id'],
                     'timestamp' => $frameData['ts'],
                     'points_count' => count($frameData['points']),
-                    'raw_payload' => $frameData, // يحتوي على dx, dy, vx, vy, angle, pressure
+                    'delta_ms' => $frameData['delta_ms'],
                 ]);
 
                 // إنشاء نقاط Point مباشرة من raw_payload
@@ -86,6 +103,11 @@ class GestureController extends Controller
                         'point_id' => $pt['id'],
                         'x' => $pt['x'],
                         'y' => $pt['y'],
+                        'dx' => $pt['dx'],
+                        'dy' => $pt['dy'],
+                        'vx' => $pt['vx'],
+                        'vy' => $pt['vy'],
+                        'angle' => $pt['angle'],
                         'state' => $pt['state'] ?? 'move',
                         'pressure' => $pt['pressure'] ?? 1.0,
                     ]);
@@ -101,6 +123,24 @@ class GestureController extends Controller
             DB::rollBack();
             return response()->json([
                 'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function countByCharacter($character)
+    {
+        try {
+            // عدّ جميع الإشارات التي تحمل نفس اسم الحرف
+            $count = Gesture::where('character', $character)->count();
+
+            return response()->json([
+                'character' => $character,
+                'count' => $count
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to count gestures',
+                'details' => $e->getMessage(),
             ], 500);
         }
     }
