@@ -6,36 +6,37 @@ use App\Http\Controllers\Controller;
 use App\Models\Gesture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Facades\Response;
 
 class GestureController extends Controller
 {
     /**
-     * عرض كل الإيماءات مع Streaming و Cache
+     * عرض الإيماءات مع Pagination و Cache
      */
-    public function index()
+    public function index(Request $request)
     {
         try {
-            // محاولة قراءة الكاش أولاً
-            $cachedGestures = Cache::get('gestures_json');
+            $perPage = (int) $request->get('per_page', 50); // عدد الإيماءات لكل صفحة
+            $page = (int) $request->get('page', 1);        // رقم الصفحة المطلوبة
 
-            if ($cachedGestures) {
-                return Response::stream(function () use ($cachedGestures) {
-                    echo $cachedGestures;
+            $cacheKey = "gestures_page_{$page}_per_{$perPage}";
+
+            // محاولة قراءة الصفحة من الكاش
+            $cachedPage = Cache::get($cacheKey);
+            if ($cachedPage) {
+                return Response::stream(function () use ($cachedPage) {
+                    echo $cachedPage;
                 }, 200, ['Content-Type' => 'application/json']);
             }
 
-            // إذا الكاش فارغ، نجهز البيانات من DB
-            $gestures = Gesture::with(['frames.points'])->lazy();
+            // إذا الصفحة غير موجودة في الكاش، نجهزها من DB
+            $gestures = Gesture::with(['frames.points'])
+                ->orderBy('id')
+                ->paginate($perPage, ['*'], 'page', $page);
 
-            $json = '';
-            $firstGesture = true;
-
-            foreach ($gestures as $gesture) {
+            $formattedGestures = $gestures->getCollection()->map(function ($gesture) {
                 $points = collect();
-
                 foreach ($gesture->frames as $frame) {
                     foreach ($frame->points as $pt) {
                         $points->push([
@@ -54,10 +55,9 @@ class GestureController extends Controller
                         ]);
                     }
                 }
-
                 $points = $points->sortBy('timestamp')->values();
 
-                $formattedGesture = [
+                return [
                     'id' => $gesture->id,
                     'character' => $gesture->character,
                     'duration_ms' => $gesture->duration_ms,
@@ -65,22 +65,22 @@ class GestureController extends Controller
                     'points_count' => $points->count(),
                     'points' => $points,
                 ];
+            });
 
-                if (!$firstGesture) $json .= ',';
-                $json .= json_encode($formattedGesture);
-                $firstGesture = false;
+            $responseJson = json_encode([
+                'count' => $gestures->total(),
+                'current_page' => $gestures->currentPage(),
+                'last_page' => $gestures->lastPage(),
+                'per_page' => $gestures->perPage(),
+                'data' => $formattedGestures,
+            ]);
 
-                // تنظيف الذاكرة بعد كل Gesture
-                unset($points, $formattedGesture);
-            }
+            // تخزين الصفحة في الكاش لمدة 60 دقيقة
+            Cache::put($cacheKey, $responseJson, now()->addMinutes(60));
 
-            $json = '[' . $json . ']';
-
-            // تخزين الكاش لمدة 60 دقيقة
-            Cache::put('gestures_json', $json, now()->addMinutes(60));
-
-            return Response::stream(function () use ($json) {
-                echo $json;
+            // إرسال الصفحة كـ JSON
+            return Response::stream(function () use ($responseJson) {
+                echo $responseJson;
             }, 200, ['Content-Type' => 'application/json']);
 
         } catch (\Exception $e) {
@@ -107,7 +107,6 @@ class GestureController extends Controller
 
         DB::beginTransaction();
         try {
-            // إنشاء Gesture
             $gesture = Gesture::create([
                 'character' => $request->character,
                 'user_id' => $request->user_id ?? null,
@@ -145,8 +144,8 @@ class GestureController extends Controller
 
             DB::commit();
 
-            // تحديث الكاش بعد الإضافة
-            Cache::forget('gestures_json');
+            // مسح كل صفحات الكاش لتحديث البيانات الجديدة
+            Cache::flush();
 
             return response()->json([
                 'message' => 'Gesture saved successfully',
@@ -168,12 +167,10 @@ class GestureController extends Controller
     {
         try {
             $count = Gesture::where('character', $character)->count();
-
             return response()->json([
                 'character' => $character,
                 'count' => $count
             ], 200);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to count gestures',
