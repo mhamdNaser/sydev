@@ -7,6 +7,7 @@ use App\Models\Gesture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\LazyCollection;
+use Illuminate\Support\Facades\Response;
 
 class GestureController extends Controller
 {
@@ -66,48 +67,59 @@ class GestureController extends Controller
     public function index()
     {
         try {
-            // استخدام LazyCollection بدل get()
             $gestures = Gesture::with(['frames.points'])->lazy();
 
-            $formattedGestures = $gestures->map(function ($gesture) {
-                $points = collect();
+            return Response::stream(function () use ($gestures) {
+                echo '[';
+                $firstGesture = true;
 
-                foreach ($gesture->frames as $frame) {
-                    foreach ($frame->points as $pt) {
-                        $points->push([
-                            'x' => $pt->x,
-                            'y' => $pt->y,
-                            'dx' => $pt->dx,
-                            'dy' => $pt->dy,
-                            'vx' => $pt->vx,
-                            'vy' => $pt->vy,
-                            'angle' => $pt->angle,
-                            'pressure' => $pt->pressure,
-                            'state' => $pt->state,
-                            'timestamp' => $frame->timestamp,
-                            'delta_ms' => $frame->delta_ms,
-                            'frame_id' => $frame->frame_id,
-                        ]);
+                $gestures->each(function ($gesture) use (&$firstGesture) {
+                    $points = collect();
+
+                    foreach ($gesture->frames as $frame) {
+                        foreach ($frame->points as $pt) {
+                            $points->push([
+                                'x' => $pt->x,
+                                'y' => $pt->y,
+                                'dx' => $pt->dx,
+                                'dy' => $pt->dy,
+                                'vx' => $pt->vx,
+                                'vy' => $pt->vy,
+                                'angle' => $pt->angle,
+                                'pressure' => $pt->pressure,
+                                'state' => $pt->state,
+                                'timestamp' => $frame->timestamp,
+                                'delta_ms' => $frame->delta_ms,
+                                'frame_id' => $frame->frame_id,
+                            ]);
+                        }
                     }
-                }
 
-                $points = $points->sortBy('timestamp')->values();
+                    $points = $points->sortBy('timestamp')->values();
 
-                return [
-                    'id' => $gesture->id,
-                    'character' => $gesture->character,
-                    'duration_ms' => $gesture->duration_ms,
-                    'frame_count' => $gesture->frame_count,
-                    'points_count' => $points->count(),
-                    'points' => $points,
-                ];
-            });
+                    $formattedGesture = [
+                        'id' => $gesture->id,
+                        'character' => $gesture->character,
+                        'duration_ms' => $gesture->duration_ms,
+                        'frame_count' => $gesture->frame_count,
+                        'points_count' => $points->count(),
+                        'points' => $points,
+                    ];
 
-            // تحويل LazyCollection إلى مصفوفة نهائية قبل الإرجاع
-            return response()->json([
-                'count' => $formattedGestures->count(),
-                'data' => $formattedGestures->all(), // all() لجمع العناصر
-            ], 200);
+                    if (!$firstGesture) {
+                        echo ',';
+                    }
+                    echo json_encode($formattedGesture);
+                    $firstGesture = false;
+
+                    // تنظيف الذاكرة بعد كل Gesture
+                    unset($points, $formattedGesture);
+                });
+
+                echo ']';
+            }, 200, [
+                'Content-Type' => 'application/json'
+            ]);
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to fetch gestures',
