@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Gesture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\LazyCollection;
 
 class GestureController extends Controller
 {
