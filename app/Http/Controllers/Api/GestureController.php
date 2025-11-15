@@ -6,120 +6,83 @@ use App\Http\Controllers\Controller;
 use App\Models\Gesture;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\LazyCollection;
 
 class GestureController extends Controller
 {
-    // public function index()
-    // {
-    //     try {
-    //         // نجلب الإيماءات مع الفريمات والنقاط المرتبطة بكل فريم
-    //         $gestures = Gesture::with(['frames.points'])->get();
-
-    //         $formattedGestures = $gestures->map(function ($gesture) {
-    //             $points = collect();
-
-    //             foreach ($gesture->frames as $frame) {
-    //                 foreach ($frame->points as $pt) {
-    //                     $points->push([
-    //                         'x' => $pt->x,
-    //                         'y' => $pt->y,
-    //                         'dx' => $pt->dx,
-    //                         'dy' => $pt->dy,
-    //                         'vx' => $pt->vx,
-    //                         'vy' => $pt->vy,
-    //                         'angle' => $pt->angle,
-    //                         'pressure' => $pt->pressure,
-    //                         'state' => $pt->state,
-    //                         'timestamp' => $frame->timestamp,
-    //                         'delta_ms' => $frame->delta_ms,
-    //                         'frame_id' => $frame->frame_id,
-    //                     ]);
-    //                 }
-    //             }
-
-    //             // ترتيب النقاط حسب الزمن
-    //             $points = $points->sortBy('timestamp')->values();
-
-    //             return [
-    //                 'id' => $gesture->id,
-    //                 'character' => $gesture->character,
-    //                 'duration_ms' => $gesture->duration_ms,
-    //                 'frame_count' => $gesture->frame_count,
-    //                 'points_count' => $points->count(),
-    //                 'points' => $points,
-    //             ];
-    //         });
-
-    //         return response()->json([
-    //             'count' => $formattedGestures->count(),
-    //             'data' => $formattedGestures,
-    //         ], 200);
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'error' => 'Failed to fetch gestures',
-    //             'details' => $e->getMessage(),
-    //         ], 500);
-    //     }
-    // }
-
+    /**
+     * عرض كل الإيماءات مع Streaming و Cache
+     */
     public function index()
     {
         try {
+            // محاولة قراءة الكاش أولاً
+            $cachedGestures = Cache::get('gestures_json');
+
+            if ($cachedGestures) {
+                return Response::stream(function () use ($cachedGestures) {
+                    echo $cachedGestures;
+                }, 200, ['Content-Type' => 'application/json']);
+            }
+
+            // إذا الكاش فارغ، نجهز البيانات من DB
             $gestures = Gesture::with(['frames.points'])->lazy();
 
-            return Response::stream(function () use ($gestures) {
-                echo '[';
-                $firstGesture = true;
+            $json = '';
+            $firstGesture = true;
 
-                $gestures->each(function ($gesture) use (&$firstGesture) {
-                    $points = collect();
+            foreach ($gestures as $gesture) {
+                $points = collect();
 
-                    foreach ($gesture->frames as $frame) {
-                        foreach ($frame->points as $pt) {
-                            $points->push([
-                                'x' => $pt->x,
-                                'y' => $pt->y,
-                                'dx' => $pt->dx,
-                                'dy' => $pt->dy,
-                                'vx' => $pt->vx,
-                                'vy' => $pt->vy,
-                                'angle' => $pt->angle,
-                                'pressure' => $pt->pressure,
-                                'state' => $pt->state,
-                                'timestamp' => $frame->timestamp,
-                                'delta_ms' => $frame->delta_ms,
-                                'frame_id' => $frame->frame_id,
-                            ]);
-                        }
+                foreach ($gesture->frames as $frame) {
+                    foreach ($frame->points as $pt) {
+                        $points->push([
+                            'x' => $pt->x,
+                            'y' => $pt->y,
+                            'dx' => $pt->dx,
+                            'dy' => $pt->dy,
+                            'vx' => $pt->vx,
+                            'vy' => $pt->vy,
+                            'angle' => $pt->angle,
+                            'pressure' => $pt->pressure,
+                            'state' => $pt->state,
+                            'timestamp' => $frame->timestamp,
+                            'delta_ms' => $frame->delta_ms,
+                            'frame_id' => $frame->frame_id,
+                        ]);
                     }
+                }
 
-                    $points = $points->sortBy('timestamp')->values();
+                $points = $points->sortBy('timestamp')->values();
 
-                    $formattedGesture = [
-                        'id' => $gesture->id,
-                        'character' => $gesture->character,
-                        'duration_ms' => $gesture->duration_ms,
-                        'frame_count' => $gesture->frame_count,
-                        'points_count' => $points->count(),
-                        'points' => $points,
-                    ];
+                $formattedGesture = [
+                    'id' => $gesture->id,
+                    'character' => $gesture->character,
+                    'duration_ms' => $gesture->duration_ms,
+                    'frame_count' => $gesture->frame_count,
+                    'points_count' => $points->count(),
+                    'points' => $points,
+                ];
 
-                    if (!$firstGesture) {
-                        echo ',';
-                    }
-                    echo json_encode($formattedGesture);
-                    $firstGesture = false;
+                if (!$firstGesture) $json .= ',';
+                $json .= json_encode($formattedGesture);
+                $firstGesture = false;
 
-                    // تنظيف الذاكرة بعد كل Gesture
-                    unset($points, $formattedGesture);
-                });
+                // تنظيف الذاكرة بعد كل Gesture
+                unset($points, $formattedGesture);
+            }
 
-                echo ']';
-            }, 200, [
-                'Content-Type' => 'application/json'
-            ]);
+            $json = '[' . $json . ']';
+
+            // تخزين الكاش لمدة 60 دقيقة
+            Cache::put('gestures_json', $json, now()->addMinutes(60));
+
+            return Response::stream(function () use ($json) {
+                echo $json;
+            }, 200, ['Content-Type' => 'application/json']);
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to fetch gestures',
@@ -128,7 +91,9 @@ class GestureController extends Controller
         }
     }
 
-
+    /**
+     * تخزين Gesture جديد وتحديث الكاش
+     */
     public function store(Request $request)
     {
         $request->validate([
@@ -155,7 +120,6 @@ class GestureController extends Controller
             ]);
 
             foreach ($request->frames as $frameData) {
-                // إنشاء Frame مع raw_payload بالكامل
                 $frame = $gesture->frames()->create([
                     'frame_id' => $frameData['frame_id'],
                     'timestamp' => $frameData['ts'],
@@ -163,7 +127,6 @@ class GestureController extends Controller
                     'delta_ms' => $frameData['delta_ms'],
                 ]);
 
-                // إنشاء نقاط Point مباشرة من raw_payload
                 foreach ($frameData['points'] as $pt) {
                     $frame->points()->create([
                         'point_id' => $pt['id'],
@@ -181,10 +144,15 @@ class GestureController extends Controller
             }
 
             DB::commit();
+
+            // تحديث الكاش بعد الإضافة
+            Cache::forget('gestures_json');
+
             return response()->json([
                 'message' => 'Gesture saved successfully',
                 'gesture_id' => $gesture->id
             ], 201);
+
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -193,16 +161,19 @@ class GestureController extends Controller
         }
     }
 
+    /**
+     * عد الإيماءات حسب الحرف
+     */
     public function countByCharacter($character)
     {
         try {
-            // عدّ جميع الإشارات التي تحمل نفس اسم الحرف
             $count = Gesture::where('character', $character)->count();
 
             return response()->json([
                 'character' => $character,
                 'count' => $count
             ], 200);
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to count gestures',
