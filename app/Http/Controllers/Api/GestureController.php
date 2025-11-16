@@ -82,7 +82,6 @@ class GestureController extends Controller
             return Response::stream(function () use ($responseJson) {
                 echo $responseJson;
             }, 200, ['Content-Type' => 'application/json']);
-
         } catch (\Exception $e) {
             return response()->json([
                 'error' => 'Failed to fetch gestures',
@@ -119,14 +118,25 @@ class GestureController extends Controller
             ]);
 
             foreach ($request->frames as $frameData) {
+
+                // فلترة النقاط التي إحداثياتها صفرية
+                $filteredPoints = array_filter($frameData['points'], function ($pt) {
+                    return !($pt['x'] == 0 && $pt['y'] == 0);
+                });
+
+                // إذا بقيت نقاط بعد الفلترة
+                if (count($filteredPoints) === 0) {
+                    continue; // تخطي هذا الفريم لأنه لا يحتوي على نقاط صالحة
+                }
+
                 $frame = $gesture->frames()->create([
                     'frame_id' => $frameData['frame_id'],
                     'timestamp' => $frameData['ts'],
-                    'points_count' => count($frameData['points']),
+                    'points_count' => count($filteredPoints),
                     'delta_ms' => $frameData['delta_ms'],
                 ]);
 
-                foreach ($frameData['points'] as $pt) {
+                foreach ($filteredPoints as $pt) {
                     $frame->points()->create([
                         'point_id' => $pt['id'],
                         'x' => $pt['x'],
@@ -144,14 +154,12 @@ class GestureController extends Controller
 
             DB::commit();
 
-            // مسح كل صفحات الكاش لتحديث البيانات الجديدة
             Cache::flush();
 
             return response()->json([
                 'message' => 'Gesture saved successfully',
                 'gesture_id' => $gesture->id
             ], 201);
-
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json([
@@ -159,6 +167,7 @@ class GestureController extends Controller
             ], 500);
         }
     }
+
 
     /**
      * عد الإيماءات حسب الحرف
